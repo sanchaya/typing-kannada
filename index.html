@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ಕೀಲಿಕನ್ನಡ — Learn to Type Kannada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Kannada:wght@500;600;700&family=Noto+Sans+Kannada:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="lattice"></div>
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">ಕೀಲಿಕನ್ನಡ · KPRao / KGP / Nudi keyboard</div>
+  <h1 class="title">ಟೈಪಿಂಗ್ ಕಲಿಯಿರಿ <span class="accent">ಕನ್ನಡ</span></h1>
+  <p class="tagline">"ಅಕ್ಷರಶಃ" ಕಲಿಯಿರಿ — learn to type Kannada, one akshara at a time.</p>
+  <p class="subtagline">An interactive keyboard tutor built directly from the KPRao/KGP/Nudi macOS keyboard layout. Practise on your own physical keyboard, watch the virtual board light up, and build real typing speed.</p>
+  <div class="source-note">layout source → <a href="https://github.com/sanchaya/KPRao-KGP-Keyboard-Layout-for-Mac" target="_blank" rel="noopener">github.com/sanchaya/KPRao-KGP-Keyboard-Layout-for-Mac</a></div>
+</header>
+
+<nav class="tabs">
+  <button data-tab="layout" class="active">ಕೀಲಿಮಣೆ <span class="en">Layout</span></button>
+  <button data-tab="practice">ಅಭ್ಯಾಸ <span class="en">Practice</span></button>
+  <button data-tab="free">ಮುಕ್ತ ಬರಹ <span class="en">Free Type</span></button>
+  <button data-tab="review">ಪರಿಶೀಲನೆ <span class="en">Review Notes</span></button>
+</nav>
+
+<!-- ================= LAYOUT TAB ================= -->
+<section class="panel active" id="panel-layout">
+  <div class="card">
+    <h2 class="section-title">ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸ</h2>
+    <p class="section-sub">Hover or click a key to preview it, or just start typing on your physical keyboard — the board below mirrors it live.</p>
+    <div class="kbd-controls">
+      <button class="toggle-btn" id="shiftToggle">⇧ Shift layer</button>
+      <span class="legend-note">Top-right of each key = <b>Shift</b> layer. Main glyph = base layer.</span>
+    </div>
+    <div class="keyboard" id="kbLayout"></div>
+    <div class="type-surface" id="surfaceLayout" tabindex="0"><span class="placeholder">Click here, then type on your physical keyboard to test the layout →</span></div>
+  </div>
+</section>
+
+<!-- ================= PRACTICE TAB ================= -->
+<section class="panel" id="panel-practice">
+  <div class="card">
+    <h2 class="section-title">ಟೈಪಿಂಗ್ ಅಭ್ಯಾಸ — Typing Tutor</h2>
+    <p class="section-sub">Work through the levels in order — vowels, consonants, combined aksharas, everyday words, then full sentences.</p>
+    <div class="level-tabs" id="levelTabs"></div>
+
+    <div class="target-box">
+      <div class="target-word" id="targetWord"></div>
+      <div class="translit" id="targetTranslit"></div>
+    </div>
+
+    <div class="type-surface" id="surfacePractice" tabindex="0"><span class="placeholder">Click here and type the akshara/word shown above →</span></div>
+
+    <div class="progress-track"><div class="progress-fill" id="levelProgress"></div></div>
+
+    <div class="stats-row">
+      <div class="stat"><div class="num" id="statWpm">0</div><div class="lbl">WPM</div></div>
+      <div class="stat"><div class="num" id="statAcc">100%</div><div class="lbl">Accuracy</div></div>
+      <div class="stat"><div class="num" id="statDone">0/0</div><div class="lbl">Completed</div></div>
+      <div class="stat"><div class="num" id="statStreak">0</div><div class="lbl">Streak</div></div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn primary" id="skipBtn">ಮುಂದೆ / Skip</button>
+      <button class="btn ghost" id="resetLevelBtn">Restart level</button>
+    </div>
+  </div>
+
+  <div class="keyboard-card card" style="margin-top:20px;">
+    <div class="keyboard" id="kbPractice"></div>
+  </div>
+</section>
+
+<!-- ================= FREE TYPE TAB ================= -->
+<section class="panel" id="panel-free">
+  <div class="card">
+    <h2 class="section-title">ಮುಕ್ತ ಬರವಣಿಗೆ — Free Type</h2>
+    <p class="section-sub">Open canvas to write freely with the layout — good for testing words, or just practising composition. Backspace understands full aksharas (it removes one visual syllable at a time, like a real Kannada IME).</p>
+    <div class="type-surface" id="surfaceFree" tabindex="0" style="min-height:180px;"><span class="placeholder">ಇಲ್ಲಿ ಬರೆಯಿರಿ — start typing here →</span></div>
+    <div class="action-row">
+      <button class="btn ghost" id="clearFreeBtn">Clear</button>
+      <button class="btn ghost" id="copyFreeBtn">Copy text</button>
+    </div>
+    <div class="future-note">
+      <h3>Coming next: spelling &amp; grammar checking</h3>
+      <p>This canvas is where inline spelling and grammar feedback will surface once the checker is wired in — underlines for misspelled aksharas, suggestions on click, and basic agreement/grammar hints. Not implemented yet in this build; flagged here as the next milestone.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REVIEW TAB ================= -->
+<section class="panel" id="panel-review">
+  <div class="card">
+    <h2 class="section-title">ಪರಿಶೀಲನೆ — Keyboard Review Notes</h2>
+    <p class="section-sub">Findings from auditing <code>KPRao-KGP-Nudi.keylayout</code> before this goes near a public release or an installer. Ordered roughly by severity.</p>
+    <div id="reviewList"></div>
+  </div>
+</section>
+
+</div>
+
+<footer>ಕೀಲಿಕನ್ನಡ · built on the KPRao/KGP/Nudi layout · practise well, ಶುಭವಾಗಲಿ</footer>
+
+<script src="app.js" defer></script>
+</body>
+</html>
