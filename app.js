@@ -29,6 +29,103 @@ const CODE_MAP = {
   Backquote:50, Backspace:51
 };
 
+/* Every assigned codepoint in the Kannada block (U+0C80–U+0CFF). `keyboard:false`
+   marks historic letters and rare signs that have no physical key on the
+   KPRao/KGP/Nudi layout — rendered on the keyboard map as a reference strip. */
+const UNICODE_COVERAGE = [
+  { cp:'U+0C80', ch:'ಀ', name:'Spacing candrabindu', keyboard:false },
+  { cp:'U+0C81', ch:'ಁ', name:'Candrabindu', keyboard:false },
+  { cp:'U+0C82', ch:'ಂ', name:'Anusvara', keyboard:true },
+  { cp:'U+0C83', ch:'ಃ', name:'Visarga', keyboard:true },
+  { cp:'U+0C84', ch:'಄', name:'Siddham', keyboard:false },
+  { cp:'U+0C85', ch:'ಅ', name:'A', keyboard:true },
+  { cp:'U+0C86', ch:'ಆ', name:'AA', keyboard:true },
+  { cp:'U+0C87', ch:'ಇ', name:'I', keyboard:true },
+  { cp:'U+0C88', ch:'ಈ', name:'II', keyboard:true },
+  { cp:'U+0C89', ch:'ಉ', name:'U', keyboard:true },
+  { cp:'U+0C8A', ch:'ಊ', name:'UU', keyboard:true },
+  { cp:'U+0C8B', ch:'ಋ', name:'Vocalic R', keyboard:true },
+  { cp:'U+0C8C', ch:'ಌ', name:'Vocalic L', keyboard:false },
+  { cp:'U+0C8E', ch:'ಎ', name:'E', keyboard:true },
+  { cp:'U+0C8F', ch:'ಏ', name:'EE', keyboard:true },
+  { cp:'U+0C90', ch:'ಐ', name:'AI', keyboard:true },
+  { cp:'U+0C92', ch:'ಒ', name:'O', keyboard:true },
+  { cp:'U+0C93', ch:'ಓ', name:'OO', keyboard:true },
+  { cp:'U+0C94', ch:'ಔ', name:'AU', keyboard:true },
+  { cp:'U+0C95', ch:'ಕ', name:'Ka', keyboard:true },
+  { cp:'U+0C96', ch:'ಖ', name:'Kha', keyboard:true },
+  { cp:'U+0C97', ch:'ಗ', name:'Ga', keyboard:true },
+  { cp:'U+0C98', ch:'ಘ', name:'Gha', keyboard:true },
+  { cp:'U+0C99', ch:'ಙ', name:'Nga', keyboard:true },
+  { cp:'U+0C9A', ch:'ಚ', name:'Ca', keyboard:true },
+  { cp:'U+0C9B', ch:'ಛ', name:'Cha', keyboard:true },
+  { cp:'U+0C9C', ch:'ಜ', name:'Ja', keyboard:true },
+  { cp:'U+0C9D', ch:'ಝ', name:'Jha', keyboard:true },
+  { cp:'U+0C9E', ch:'ಞ', name:'Nya', keyboard:true },
+  { cp:'U+0C9F', ch:'ಟ', name:'Tta', keyboard:true },
+  { cp:'U+0CA0', ch:'ಠ', name:'Ttha', keyboard:true },
+  { cp:'U+0CA1', ch:'ಡ', name:'Dda', keyboard:true },
+  { cp:'U+0CA2', ch:'ಢ', name:'Ddha', keyboard:true },
+  { cp:'U+0CA3', ch:'ಣ', name:'Nna', keyboard:true },
+  { cp:'U+0CA4', ch:'ತ', name:'Ta', keyboard:true },
+  { cp:'U+0CA5', ch:'ಥ', name:'Tha', keyboard:true },
+  { cp:'U+0CA6', ch:'ದ', name:'Da', keyboard:true },
+  { cp:'U+0CA7', ch:'ಧ', name:'Dha', keyboard:true },
+  { cp:'U+0CA8', ch:'ನ', name:'Na', keyboard:true },
+  { cp:'U+0CAA', ch:'ಪ', name:'Pa', keyboard:true },
+  { cp:'U+0CAB', ch:'ಫ', name:'Pha', keyboard:true },
+  { cp:'U+0CAC', ch:'ಬ', name:'Ba', keyboard:true },
+  { cp:'U+0CAD', ch:'ಭ', name:'Bha', keyboard:true },
+  { cp:'U+0CAE', ch:'ಮ', name:'Ma', keyboard:true },
+  { cp:'U+0CAF', ch:'ಯ', name:'Ya', keyboard:true },
+  { cp:'U+0CB0', ch:'ರ', name:'Ra', keyboard:true },
+  { cp:'U+0CB1', ch:'ಱ', name:'Rra', keyboard:false },
+  { cp:'U+0CB2', ch:'ಲ', name:'La', keyboard:true },
+  { cp:'U+0CB3', ch:'ಳ', name:'Lla', keyboard:true },
+  { cp:'U+0CB5', ch:'ವ', name:'Va', keyboard:true },
+  { cp:'U+0CB6', ch:'ಶ', name:'Sha', keyboard:true },
+  { cp:'U+0CB7', ch:'ಷ', name:'Ssa', keyboard:true },
+  { cp:'U+0CB8', ch:'ಸ', name:'Sa', keyboard:true },
+  { cp:'U+0CB9', ch:'ಹ', name:'Ha', keyboard:true },
+  { cp:'U+0CBC', ch:'಼', name:'Nukta', keyboard:true },
+  { cp:'U+0CBD', ch:'ಽ', name:'Avagraha', keyboard:true },
+  { cp:'U+0CBE', ch:'ಾ', name:'Sign AA', keyboard:true },
+  { cp:'U+0CBF', ch:'ಿ', name:'Sign I', keyboard:true },
+  { cp:'U+0CC0', ch:'ೀ', name:'Sign II', keyboard:true },
+  { cp:'U+0CC1', ch:'ು', name:'Sign U', keyboard:true },
+  { cp:'U+0CC2', ch:'ೂ', name:'Sign UU', keyboard:true },
+  { cp:'U+0CC3', ch:'ೃ', name:'Sign ṛ', keyboard:true },
+  { cp:'U+0CC4', ch:'ೄ', name:'Sign ṝ', keyboard:true },
+  { cp:'U+0CC6', ch:'ೆ', name:'Sign E', keyboard:true },
+  { cp:'U+0CC7', ch:'ೇ', name:'Sign EE', keyboard:true },
+  { cp:'U+0CC8', ch:'ೈ', name:'Sign AI', keyboard:true },
+  { cp:'U+0CCA', ch:'ೊ', name:'Sign O', keyboard:true },
+  { cp:'U+0CCB', ch:'ೋ', name:'Sign OO', keyboard:true },
+  { cp:'U+0CCC', ch:'ೌ', name:'Sign AU', keyboard:true },
+  { cp:'U+0CCD', ch:'್', name:'Virama', keyboard:true },
+  { cp:'U+0CD5', ch:'ೕ', name:'Length mark', keyboard:false },
+  { cp:'U+0CD6', ch:'ೖ', name:'AI length mark', keyboard:false },
+  { cp:'U+0CDD', ch:'ೝ', name:'Nakaara pollu', keyboard:false },
+  { cp:'U+0CDE', ch:'ೞ', name:'Fa', keyboard:false },
+  { cp:'U+0CE0', ch:'ೠ', name:'Vocalic RR', keyboard:false },
+  { cp:'U+0CE1', ch:'ೡ', name:'Vocalic LL', keyboard:false },
+  { cp:'U+0CE2', ch:'ೢ', name:'Sign ḷ', keyboard:false },
+  { cp:'U+0CE3', ch:'ೣ', name:'Sign ḻ', keyboard:false },
+  { cp:'U+0CE6', ch:'೦', name:'0', keyboard:true },
+  { cp:'U+0CE7', ch:'೧', name:'1', keyboard:true },
+  { cp:'U+0CE8', ch:'೨', name:'2', keyboard:true },
+  { cp:'U+0CE9', ch:'೩', name:'3', keyboard:true },
+  { cp:'U+0CEA', ch:'೪', name:'4', keyboard:true },
+  { cp:'U+0CEB', ch:'೫', name:'5', keyboard:true },
+  { cp:'U+0CEC', ch:'೬', name:'6', keyboard:true },
+  { cp:'U+0CED', ch:'೭', name:'7', keyboard:true },
+  { cp:'U+0CEE', ch:'೮', name:'8', keyboard:true },
+  { cp:'U+0CEF', ch:'೯', name:'9', keyboard:true },
+  { cp:'U+0CF1', ch:'ೱ', name:'Jihvamuliya', keyboard:false },
+  { cp:'U+0CF2', ch:'ೲ', name:'Upadhmaniya', keyboard:false },
+  { cp:'U+0CF3', ch:'ೳ', name:'Combining anusvara', keyboard:false }
+];
+
 function controlLabel(v){
   switch(v){
     case '\t': return 'Tab';
@@ -147,6 +244,22 @@ function renderKeyboard(container){
   bottomRow.appendChild(buildKeyEl(36, true));   // Return
   bottomRow.appendChild(buildKeyEl(51, true));   // Backspace
   container.appendChild(bottomRow);
+
+  const refRow = renderReferenceRow();
+  if(refRow) container.appendChild(refRow);
+}
+
+/* Historic letters and rare signs that have no physical key on the
+   KPRao/KGP/Nudi layout — a compact reference under the keyboard map so the
+   full Kannada Unicode block is visible where you type. */
+function renderReferenceRow(){
+  const refs = UNICODE_COVERAGE.filter(u=>!u.keyboard);
+  if(!refs.length) return null;
+  const row = document.createElement('div');
+  row.className = 'kbd-ref-row';
+  row.innerHTML = `<span class="kbd-ref-label">ಐತಿಹಾಸಿಕ · no key · <b>${refs.length}</b> reference:</span>` +
+    refs.map(u=>`<span class="kbd-ref" title="U+${u.cp.slice(2)} KANNADA ${u.name} — historic / rare, no physical key"><b class="ref-glyph">${u.ch}</b><span class="ref-code">${u.cp.slice(2)}</span></span>`).join('');
+  return row;
 }
 
 function flashKey(container, code, shift){
@@ -200,7 +313,7 @@ function attachTypingSurface(el, kbContainer, opts){
 
   el.addEventListener('click', ()=> el.focus());
 
-  el.addEventListener('keydown', (e)=>{
+  function handleKey(e){
     if(e.ctrlKey || e.metaKey || e.altKey) return;
     if(e.key === 'Tab' || e.key === 'Escape') return; // let browser handle focus/escape
 
@@ -224,14 +337,17 @@ function attachTypingSurface(el, kbContainer, opts){
       // reflect current pending state visually as "shifted" tint on nothing extra – flashAll already covers press feedback
     }
     render();
-  });
+  }
+
+  el.addEventListener('keydown', handleKey);
 
   render();
   return {
     getText: ()=> buffer,
     setText: (t)=> { buffer = t; engine.reset(); render(); },
     focusEl: el,
-    engine
+    engine,
+    handleKey
   };
 }
 
@@ -252,8 +368,20 @@ document.querySelectorAll('nav.tabs button').forEach(btn=>{
    ============================================================ */
 const kbLayout = document.getElementById('kbLayout');
 renderKeyboard(kbLayout);
-attachTypingSurface(document.getElementById('surfaceLayout'), kbLayout, {
-  placeholder: 'Click here, then type on your physical keyboard to test the layout →'
+const layoutSurface = attachTypingSurface(document.getElementById('surfaceLayout'), kbLayout, {
+  placeholder: 'Start typing — the board below mirrors your physical keyboard live →'
+});
+
+/* Respond to the system keyboard directly on the Layout tab, without needing
+   to click into the surface first. Only active while the Layout panel is open
+   and the user is not already typing into a surface/input. */
+document.addEventListener('keydown', (e)=>{
+  const layout = document.getElementById('panel-layout');
+  if(!layout || !layout.classList.contains('active')) return;
+  const t = e.target;
+  if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+  if(t && t.classList && t.classList.contains('type-surface')) return; // focused surface handles its own
+  layoutSurface.handleKey(e);
 });
 
 let shiftLayerOn = false;
@@ -522,100 +650,6 @@ COMPLEX_EXAMPLES.forEach(ex=>{
 });
 
 /* ---------- Full Kannada Unicode block coverage (U+0C80–U+0CFF) ---------- */
-const UNICODE_COVERAGE = [
-  { cp:'U+0C80', ch:'ಀ', name:'Spacing candrabindu', keyboard:false },
-  { cp:'U+0C81', ch:'ಁ', name:'Candrabindu', keyboard:false },
-  { cp:'U+0C82', ch:'ಂ', name:'Anusvara', keyboard:true },
-  { cp:'U+0C83', ch:'ಃ', name:'Visarga', keyboard:true },
-  { cp:'U+0C84', ch:'಄', name:'Siddham', keyboard:false },
-  { cp:'U+0C85', ch:'ಅ', name:'A', keyboard:true },
-  { cp:'U+0C86', ch:'ಆ', name:'AA', keyboard:true },
-  { cp:'U+0C87', ch:'ಇ', name:'I', keyboard:true },
-  { cp:'U+0C88', ch:'ಈ', name:'II', keyboard:true },
-  { cp:'U+0C89', ch:'ಉ', name:'U', keyboard:true },
-  { cp:'U+0C8A', ch:'ಊ', name:'UU', keyboard:true },
-  { cp:'U+0C8B', ch:'ಋ', name:'Vocalic R', keyboard:true },
-  { cp:'U+0C8C', ch:'ಌ', name:'Vocalic L', keyboard:false },
-  { cp:'U+0C8E', ch:'ಎ', name:'E', keyboard:true },
-  { cp:'U+0C8F', ch:'ಏ', name:'EE', keyboard:true },
-  { cp:'U+0C90', ch:'ಐ', name:'AI', keyboard:true },
-  { cp:'U+0C92', ch:'ಒ', name:'O', keyboard:true },
-  { cp:'U+0C93', ch:'ಓ', name:'OO', keyboard:true },
-  { cp:'U+0C94', ch:'ಔ', name:'AU', keyboard:true },
-  { cp:'U+0C95', ch:'ಕ', name:'Ka', keyboard:true },
-  { cp:'U+0C96', ch:'ಖ', name:'Kha', keyboard:true },
-  { cp:'U+0C97', ch:'ಗ', name:'Ga', keyboard:true },
-  { cp:'U+0C98', ch:'ಘ', name:'Gha', keyboard:true },
-  { cp:'U+0C99', ch:'ಙ', name:'Nga', keyboard:true },
-  { cp:'U+0C9A', ch:'ಚ', name:'Ca', keyboard:true },
-  { cp:'U+0C9B', ch:'ಛ', name:'Cha', keyboard:true },
-  { cp:'U+0C9C', ch:'ಜ', name:'Ja', keyboard:true },
-  { cp:'U+0C9D', ch:'ಝ', name:'Jha', keyboard:true },
-  { cp:'U+0C9E', ch:'ಞ', name:'Nya', keyboard:true },
-  { cp:'U+0C9F', ch:'ಟ', name:'Tta', keyboard:true },
-  { cp:'U+0CA0', ch:'ಠ', name:'Ttha', keyboard:true },
-  { cp:'U+0CA1', ch:'ಡ', name:'Dda', keyboard:true },
-  { cp:'U+0CA2', ch:'ಢ', name:'Ddha', keyboard:true },
-  { cp:'U+0CA3', ch:'ಣ', name:'Nna', keyboard:true },
-  { cp:'U+0CA4', ch:'ತ', name:'Ta', keyboard:true },
-  { cp:'U+0CA5', ch:'ಥ', name:'Tha', keyboard:true },
-  { cp:'U+0CA6', ch:'ದ', name:'Da', keyboard:true },
-  { cp:'U+0CA7', ch:'ಧ', name:'Dha', keyboard:true },
-  { cp:'U+0CA8', ch:'ನ', name:'Na', keyboard:true },
-  { cp:'U+0CAA', ch:'ಪ', name:'Pa', keyboard:true },
-  { cp:'U+0CAB', ch:'ಫ', name:'Pha', keyboard:true },
-  { cp:'U+0CAC', ch:'ಬ', name:'Ba', keyboard:true },
-  { cp:'U+0CAD', ch:'ಭ', name:'Bha', keyboard:true },
-  { cp:'U+0CAE', ch:'ಮ', name:'Ma', keyboard:true },
-  { cp:'U+0CAF', ch:'ಯ', name:'Ya', keyboard:true },
-  { cp:'U+0CB0', ch:'ರ', name:'Ra', keyboard:true },
-  { cp:'U+0CB1', ch:'ಱ', name:'Rra', keyboard:false },
-  { cp:'U+0CB2', ch:'ಲ', name:'La', keyboard:true },
-  { cp:'U+0CB3', ch:'ಳ', name:'Lla', keyboard:true },
-  { cp:'U+0CB5', ch:'ವ', name:'Va', keyboard:true },
-  { cp:'U+0CB6', ch:'ಶ', name:'Sha', keyboard:true },
-  { cp:'U+0CB7', ch:'ಷ', name:'Ssa', keyboard:true },
-  { cp:'U+0CB8', ch:'ಸ', name:'Sa', keyboard:true },
-  { cp:'U+0CB9', ch:'ಹ', name:'Ha', keyboard:true },
-  { cp:'U+0CBC', ch:'಼', name:'Nukta', keyboard:true },
-  { cp:'U+0CBD', ch:'ಽ', name:'Avagraha', keyboard:true },
-  { cp:'U+0CBE', ch:'ಾ', name:'Sign AA', keyboard:true },
-  { cp:'U+0CBF', ch:'ಿ', name:'Sign I', keyboard:true },
-  { cp:'U+0CC0', ch:'ೀ', name:'Sign II', keyboard:true },
-  { cp:'U+0CC1', ch:'ು', name:'Sign U', keyboard:true },
-  { cp:'U+0CC2', ch:'ೂ', name:'Sign UU', keyboard:true },
-  { cp:'U+0CC3', ch:'ೃ', name:'Sign ṛ', keyboard:true },
-  { cp:'U+0CC4', ch:'ೄ', name:'Sign ṝ', keyboard:true },
-  { cp:'U+0CC6', ch:'ೆ', name:'Sign E', keyboard:true },
-  { cp:'U+0CC7', ch:'ೇ', name:'Sign EE', keyboard:true },
-  { cp:'U+0CC8', ch:'ೈ', name:'Sign AI', keyboard:true },
-  { cp:'U+0CCA', ch:'ೊ', name:'Sign O', keyboard:true },
-  { cp:'U+0CCB', ch:'ೋ', name:'Sign OO', keyboard:true },
-  { cp:'U+0CCC', ch:'ೌ', name:'Sign AU', keyboard:true },
-  { cp:'U+0CCD', ch:'್', name:'Virama', keyboard:true },
-  { cp:'U+0CD5', ch:'ೕ', name:'Length mark', keyboard:false },
-  { cp:'U+0CD6', ch:'ೖ', name:'AI length mark', keyboard:false },
-  { cp:'U+0CDD', ch:'ೝ', name:'Nakaara pollu', keyboard:false },
-  { cp:'U+0CDE', ch:'ೞ', name:'Fa', keyboard:false },
-  { cp:'U+0CE0', ch:'ೠ', name:'Vocalic RR', keyboard:false },
-  { cp:'U+0CE1', ch:'ೡ', name:'Vocalic LL', keyboard:false },
-  { cp:'U+0CE2', ch:'ೢ', name:'Sign ḷ', keyboard:false },
-  { cp:'U+0CE3', ch:'ೣ', name:'Sign ḻ', keyboard:false },
-  { cp:'U+0CE6', ch:'೦', name:'0', keyboard:true },
-  { cp:'U+0CE7', ch:'೧', name:'1', keyboard:true },
-  { cp:'U+0CE8', ch:'೨', name:'2', keyboard:true },
-  { cp:'U+0CE9', ch:'೩', name:'3', keyboard:true },
-  { cp:'U+0CEA', ch:'೪', name:'4', keyboard:true },
-  { cp:'U+0CEB', ch:'೫', name:'5', keyboard:true },
-  { cp:'U+0CEC', ch:'೬', name:'6', keyboard:true },
-  { cp:'U+0CED', ch:'೭', name:'7', keyboard:true },
-  { cp:'U+0CEE', ch:'೮', name:'8', keyboard:true },
-  { cp:'U+0CEF', ch:'೯', name:'9', keyboard:true },
-  { cp:'U+0CF1', ch:'ೱ', name:'Jihvamuliya', keyboard:false },
-  { cp:'U+0CF2', ch:'ೲ', name:'Upadhmaniya', keyboard:false },
-  { cp:'U+0CF3', ch:'ೳ', name:'Combining anusvara', keyboard:false }
-];
-
 const unicodeGridEl = document.getElementById('unicodeGrid');
 if(unicodeGridEl){
   const onKeyboard = UNICODE_COVERAGE.filter(u=>u.keyboard).length;

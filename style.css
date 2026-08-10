@@ -182,6 +182,37 @@ h2.section-title{
 .key.pressed .main, .key.pressed .top, .key.pressed .qwerty{color:#fff;}
 .key.shifted .main{color:var(--primary);}
 
+.kbd-ref-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  justify-content:center;
+  align-items:center;
+  margin-top:14px;
+  padding-top:12px;
+  border-top:1px dashed var(--line);
+}
+.kbd-ref-label{
+  font-size:11px;
+  color:var(--muted, #8a88a0);
+  font-family:'Noto Sans',sans-serif;
+  margin-right:2px;
+}
+.kbd-ref-label b{color:var(--primary);font-weight:600;}
+.kbd-ref{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:4px 7px;
+  border:1px dashed var(--line);
+  border-radius:7px;
+  background:#fbfbfd;
+  cursor:help;
+}
+.kbd-ref:hover{border-color:var(--primary);background:var(--hover);}
+.kbd-ref .ref-glyph{font-family:'Noto Sans Kannada',sans-serif;font-size:15px;color:var(--ink);}
+.kbd-ref .ref-code{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted, #8a88a0);}
+
 .type-surface{
   margin-top:20px;
   min-height:64px;
