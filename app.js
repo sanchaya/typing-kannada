@@ -148,11 +148,38 @@ function getDisplayChar(cellEntry){
   return '';
 }
 
+/* -- Historic letters: backquote ` is a dead key; ʻ`ʼ + <key> emits a historic
+   Kannada Unicode character that has no physical key on the KPRao/KGP/Nudi
+   layout. Every surface feeds keys through engine.press(), so sequences work
+   in Layout, Practice, Complex and Free tabs alike. -- */
+const HISTORIC_PREFIX_CODE = 50; // Backquote
+const HISTORIC_PREFIX = '\u0060';
+// keycode -> historic char: code*2 + (shift?1:0)
+const HISTORIC_SEQ = {
+  2:  '\u0C84', //  ` + s      → ಄ SIDDHAM
+  16: '\u0C81', //  ` + c      → ಁ CANDRABINDU
+  18: '\u0C8C', //  ` + v      → ಌ VOCALIC L
+  26: '\u0CE2', //  ` + w      → ೢ  SIGN Ḷ
+  27: '\u0CE3', //  ` + W      → ೣ  SIGN Ḻ
+  28: '\u0CD5', //  ` + e      → ೕ  LENGTH MARK
+  30: '\u0CB1', //  ` + r      → ಱ RRA
+  31: '\u0CE0', //  ` + R      → ೠ  VOCALIC RR
+  33: '\u0CD6', //  ` + Y      → ೖ  AI LENGTH MARK
+  64: '\u0CF2', //  ` + u      → ೲ  UPADHMANIYA
+  74: '\u0CDE', //  ` + l      → ೞ FA
+  75: '\u0CE1', //  ` + L      → ೡ  VOCALIC LL
+  76: '\u0CF1', //  ` + j      → ೱ  JIHVAMULIYA
+  90: '\u0CDD', //  ` + n      → ೝ  NAKAARA POLLU
+  92: '\u0CF3', //  ` + m      → ೳ  COMBINING ANUSVARA
+  93: '\u0C80'  //  ` + M      → ಀ SPACING CANDRABINDU
+};
+
 /* ---------------- Engine: mirrors the Ukelele action/terminator state machine ---------------- */
 class KannadaEngine{
-  constructor(){ this.state = 'none'; }
-  reset(){ this.state = 'none'; }
-  press(code, shift){
+  constructor(){ this.state = 'none'; this.seq = null; }
+  reset(){ this.state = 'none'; this.seq = null; }
+  /* core layout press — no historic-sequence handling */
+  pressLayout(code, shift){
     const km = shift ? LAYOUT.keymap1 : LAYOUT.keymap0;
     const entry = km[code];
     if(!entry) return '';
@@ -182,16 +209,34 @@ class KannadaEngine{
     }
     return out;
   }
+  /* top-level press: resolves historic dead-key sequences first, otherwise
+     delegates to the layout state machine */
+  press(code, shift){
+    if(this.seq !== null){
+      const hit = HISTORIC_SEQ[code * 2 + (shift ? 1 : 0)];
+      this.seq = null;
+      if(hit) return hit;
+      return HISTORIC_PREFIX + this.pressLayout(code, shift);
+    }
+    if(code === HISTORIC_PREFIX_CODE && !shift){
+      this.seq = HISTORIC_PREFIX;
+      return '';
+    }
+    return this.pressLayout(code, shift);
+  }
   /* returns true if a pending (uncommitted) state was cancelled rather than
      needing an actual character deleted from the text buffer */
   backspace(){
+    if(this.seq !== null){ this.seq = null; return true; }
     if(this.state !== 'none'){ this.state = 'none'; return true; }
     return false;
   }
   pendingPreview(){
+    if(this.seq !== null) return this.seq;
     return this.state === 'none' ? '' : (LAYOUT.terminators[this.state] || '');
   }
   flush(){
+    if(this.seq !== null){ const out = this.seq; this.seq = null; return out; }
     if(this.state !== 'none'){
       const out = LAYOUT.terminators[this.state] || '';
       this.state = 'none';
@@ -214,6 +259,15 @@ const QWERTY_LABEL = {
   0:'A',1:'S',2:'D',3:'F',5:'G',4:'H',38:'J',40:'K',37:'L',41:';',39:"'",
   6:'Z',7:'X',8:'C',9:'V',11:'B',45:'N',46:'M',43:',',47:'.',44:'/'
 };
+
+/* char -> human-readable keystrokes, e.g. "` + r" (rendered as <kbd> helpers) */
+const HISTORIC_STROKE = {};
+for(const key in HISTORIC_SEQ){
+  const code = Math.floor(key / 2);
+  const shift = key % 2 === 1;
+  const label = QWERTY_LABEL[code] || code;
+  HISTORIC_STROKE[HISTORIC_SEQ[key]] = '`' + (shift ? label.toUpperCase() : label.toLowerCase());
+}
 
 function buildKeyEl(code, wide, isSpace){
   const el = document.createElement('div');
@@ -250,15 +304,20 @@ function renderKeyboard(container){
 }
 
 /* Historic letters and rare signs that have no physical key on the
-   KPRao/KGP/Nudi layout — a compact reference under the keyboard map so the
-   full Kannada Unicode block is visible where you type. */
+   KPRao/KGP/Nudi layout — a compact reference under the keyboard map. Each is
+   still typeable: backquote ` is a dead key, then the shown key. */
 function renderReferenceRow(){
   const refs = UNICODE_COVERAGE.filter(u=>!u.keyboard);
   if(!refs.length) return null;
   const row = document.createElement('div');
   row.className = 'kbd-ref-row';
-  row.innerHTML = `<span class="kbd-ref-label">ಐತಿಹಾಸಿಕ · no key · <b>${refs.length}</b> reference:</span>` +
-    refs.map(u=>`<span class="kbd-ref" title="U+${u.cp.slice(2)} KANNADA ${u.name} — historic / rare, no physical key"><b class="ref-glyph">${u.ch}</b><span class="ref-code">${u.cp.slice(2)}</span></span>`).join('');
+  row.innerHTML = `<span class="kbd-ref-label">ಐತಿಹಾಸಿಕ · <b>${refs.length}</b> — type <kbd>\`</kbd> then the key:</span>` +
+    refs.map(u=>{
+      const stroke = HISTORIC_STROKE[u.ch];
+      return `<span class="kbd-ref" title="U+${u.cp.slice(2)} KANNADA ${u.name}"><b class="ref-glyph">${u.ch}</b>` +
+        (stroke ? `<span class="ref-stroke"><kbd>${stroke}</kbd></span>` : `<span class="ref-code">${u.cp.slice(2)}</span>`) +
+        `</span>`;
+    }).join('');
   return row;
 }
 
@@ -655,16 +714,17 @@ if(unicodeGridEl){
   const onKeyboard = UNICODE_COVERAGE.filter(u=>u.keyboard).length;
   const coverageNote = document.createElement('div');
   coverageNote.className = 'coverage-note';
-  coverageNote.innerHTML = `<b>ಒಟ್ಟು ${UNICODE_COVERAGE.length}</b> assigned codepoints in the Kannada block — <b>${onKeyboard}</b> reachable on this keyboard, <b>${UNICODE_COVERAGE.length - onKeyboard}</b> historic/sign characters shown as reference (they have no physical key on the KPRao/KGP/Nudi layout, and whether they render depends on your font).`;
+  coverageNote.innerHTML = `<b>ಒಟ್ಟು ${UNICODE_COVERAGE.length}</b> assigned codepoints in the Kannada block — <b>${onKeyboard}</b> reachable on this keyboard, <b>${UNICODE_COVERAGE.length - onKeyboard}</b> historic/sign characters typeable via <kbd>\`</kbd> + key sequences (shown below):`;
   unicodeGridEl.parentNode.insertBefore(coverageNote, unicodeGridEl);
   UNICODE_COVERAGE.forEach(u=>{
     const cell = document.createElement('div');
     cell.className = 'u-cell' + (u.keyboard ? '' : ' u-ref');
-    cell.title = `${u.cp} KANNADA ${u.name}`;
+    const stroke = HISTORIC_STROKE[u.ch];
+    cell.title = stroke ? `${u.cp} KANNADA ${u.name} — type ${stroke}` : `${u.cp} KANNADA ${u.name}`;
     cell.innerHTML = `
       <span class="u-glyph">${u.ch}</span>
-      <span class="u-code">${u.cp}</span>
-      <span class="u-badge">${u.keyboard ? 'ಕೀ · layout' : 'reference'}</span>
+      ${stroke ? `<span class="u-stroke"><kbd>${stroke}</kbd></span>` : `<span class="u-code">${u.cp}</span>`}
+      <span class="u-badge">${u.keyboard ? 'ಕೀ · layout' : 'hist · ` + key'}</span>
     `;
     unicodeGridEl.appendChild(cell);
   });

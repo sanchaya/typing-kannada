@@ -212,6 +212,39 @@ h2.section-title{
 .kbd-ref:hover{border-color:var(--primary);background:var(--hover);}
 .kbd-ref .ref-glyph{font-family:'Noto Sans Kannada',sans-serif;font-size:15px;color:var(--ink);}
 .kbd-ref .ref-code{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted, #8a88a0);}
+.kbd-ref .ref-stroke kbd, .u-cell .u-stroke kbd{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  font-weight:600;
+  color:var(--primary);
+  background:var(--hover, #f0f0fa);
+  border:1px solid var(--line);
+  border-bottom-width:2px;
+  border-radius:4px;
+  padding:1px 4px;
+}
+.kbd-ref-label kbd{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  font-weight:600;
+  color:var(--primary);
+  background:var(--hover, #f0f0fa);
+  border:1px solid var(--line);
+  border-bottom-width:2px;
+  border-radius:4px;
+  padding:1px 4px;
+}
+.coverage-note kbd{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  font-weight:600;
+  color:var(--primary);
+  background:var(--hover, #f0f0fa);
+  border:1px solid var(--line);
+  border-bottom-width:2px;
+  border-radius:4px;
+  padding:1px 4px;
+}
 
 .type-surface{
   margin-top:20px;
@@ -353,6 +386,7 @@ h2.section-title{
 }
 .u-ref .u-glyph{color:#9aa3b2;}
 .u-code{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--ink-soft);letter-spacing:.02em;}
+.u-cell .u-stroke{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--ink-soft);}
 .u-badge{
   font-family:'Inter',sans-serif;font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
   color:var(--primary);padding:1px 6px;border-radius:5px;background:rgba(67,97,238,0.08);
