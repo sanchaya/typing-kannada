@@ -256,6 +256,78 @@ h2.section-title{
 .btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink-soft);}
 .btn.ghost:hover{border-color:var(--primary);color:var(--primary);background:var(--hover);}
 
+/* ---------- Complex characters tab ---------- */
+.complex-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+  gap:16px;
+}
+.cx-card{
+  background:#fff;border:1px solid var(--line);border-radius:12px;
+  padding:18px 18px 16px;
+  transition: box-shadow .15s ease;
+}
+.cx-card:hover{box-shadow:var(--shadow-hover);}
+.cx-tag{
+  display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:5px;
+  background:rgba(67,97,238,0.09);color:var(--primary);margin-bottom:10px;
+}
+.cx-word{font-family:'Noto Serif Kannada',serif;font-size:32px;font-weight:600;color:var(--ink);}
+.cx-gloss{font-size:12.5px;color:var(--ink-soft);margin:2px 0 12px;font-style:italic;}
+.cx-row{font-size:12px;color:var(--ink-soft);margin-bottom:6px;line-height:1.5;}
+.cx-row b{color:var(--ink);font-weight:600;}
+.cx-keys{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0 10px;}
+.cx-key{
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;
+  background:var(--bg);border:1px solid var(--line);border-bottom:2px solid #c9c9d8;
+  border-radius:5px;padding:3px 7px;color:var(--ink);
+}
+.cx-key.shift::before{content:'⇧ ';color:var(--primary);}
+.cx-codepoints{
+  display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;padding-top:10px;border-top:1px dashed var(--line);
+}
+.cx-cp{
+  font-family:'JetBrains Mono',monospace;font-size:10px;text-align:center;
+  background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 6px;
+  min-width:34px;
+}
+.cx-cp .glyph{font-family:'Noto Sans Kannada',sans-serif;font-size:14px;display:block;color:var(--primary);}
+.cx-cp .code{display:block;color:var(--ink-soft);margin-top:2px;}
+.cx-cp.invisible .glyph{opacity:.35;font-style:italic;font-size:9px;}
+
+/* ---------- Full Unicode coverage grid ---------- */
+.section-subtitle{
+  font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:var(--ink);
+  margin:28px 0 4px;letter-spacing:-.01em;
+}
+.coverage-note{
+  font-size:12.5px;color:var(--ink-soft);margin:0 0 12px;line-height:1.5;
+  background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 12px;
+}
+.unicode-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;
+}
+.u-cell{
+  background:#fff;border:1px solid #cfd6df;border-top:3px solid #3fce7a;
+  border-radius:8px;padding:8px 6px 7px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  transition: box-shadow .15s ease;
+}
+.u-cell:hover{box-shadow:var(--shadow-hover);}
+.u-cell.u-ref{border-top:3px solid #dfe3ec;}
+.u-glyph{
+  font-family:'Noto Sans Kannada',sans-serif;font-size:20px;line-height:1.2;
+  color:var(--ink);min-width:20px;min-height:24px;display:flex;align-items:center;justify-content:center;
+}
+.u-ref .u-glyph{color:#9aa3b2;}
+.u-code{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--ink-soft);letter-spacing:.02em;}
+.u-badge{
+  font-family:'Inter',sans-serif;font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--primary);padding:1px 6px;border-radius:5px;background:rgba(67,97,238,0.08);
+}
+.u-ref .u-badge{color:#8a93a6;background:var(--bg);}
+
 /* ---------- Review tab ---------- */
 .finding{
   border-left:3px solid var(--primary);

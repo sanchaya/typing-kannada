@@ -33,6 +33,7 @@
   <button data-tab="layout" class="active">ಕೀಲಿಮಣೆ <span class="en">Layout</span></button>
   <button data-tab="practice">ಅಭ್ಯಾಸ <span class="en">Practice</span></button>
   <button data-tab="free">ಮುಕ್ತ ಬರಹ <span class="en">Free Type</span></button>
+  <button data-tab="complex">ಸಂಕೀರ್ಣ <span class="en">Complex Chars</span></button>
   <button data-tab="review">ಪರಿಶೀಲನೆ <span class="en">Review Notes</span></button>
 </nav>
 
@@ -98,6 +99,19 @@
       <h3>Coming next: spelling &amp; grammar checking</h3>
       <p>This canvas is where inline spelling and grammar feedback will surface once the checker is wired in — underlines for misspelled aksharas, suggestions on click, and basic agreement/grammar hints. Not implemented yet in this build; flagged here as the next milestone.</p>
     </div>
+  </div>
+</section>
+
+<!-- ================= COMPLEX CHARACTERS TAB ================= -->
+<section class="panel" id="panel-complex">
+  <div class="card">
+    <h2 class="section-title">ಸಂಕೀರ್ಣ ಅಕ್ಷರಗಳು — Complex Character Rendering</h2>
+    <p class="section-sub">Kannada script does more than one letter per keystroke: consonant clusters, traditional ligatures, vocalic matras, nukta forms, and invisible joiners. Each card below shows the target text, what it's built from, the exact keystrokes that produce it, and its raw Unicode codepoints — useful both for learning and for checking how your font renders these.</p>
+    <div id="complexGrid" class="complex-grid"></div>
+
+    <h3 class="section-subtitle">ಪೂರ್ಣ ಯುನಿಕೋಡ್ ವ್ಯಾಪ್ತಿ — Full Unicode block coverage</h3>
+    <p class="section-sub">Every assigned codepoint in the Kannada block (U+0C80–U+0CFF). Green-bordered tiles are reachable on this keyboard; the rest are historic letters and rare signs that have no physical key on the KPRao/KGP/Nudi layout — shown here as a font-rendering reference. If a tile shows a placeholder box, your font lacks that glyph.</p>
+    <div id="unicodeGrid" class="unicode-grid"></div>
   </div>
 </section>
 
