@@ -1,20 +1,54 @@
 /* ============================================================
    ಕೀಲಿಕನ್ನಡ — Kannada typing tutor
-   Engine faithfully re-implements the KPRao/KGP/Nudi macOS
-   keyboard-layout state machine (actions + terminators) so that
-   physical key sequences on a US ANSI keyboard produce the same
-   Kannada text the real installed keyboard layout would.
+   Data-driven, multi-layout. A registry (data/layouts.json) lists
+   every layout; each layout's full config (keymap state machine OR
+   jquery.IME rule set, historic sequences, examples, findings) lives
+   in data/layouts/<id>.json. This app is a thin, generic shell:
+   - type "keymap"  → a faithful re-implementation of the KPRao/KGP/Nudi
+     macOS .keylayout action/terminator state machine.
+   - type "ime"     → a faithful port of Wikimedia jQuery.IME's
+     transliterate() (patterns / patterns_x / context window / noop
+     passthrough) for the InScript / Enhanced InScript / ITRANS-style
+     transliteration rule sets.
    ============================================================ */
 
 (async function(){
+"use strict";
 
+/* ---------------- bootstrap: registry + selected layout ---------------- */
+async function fetchJson(url){
+  const r = await fetch(url);
+  if(!r.ok) throw new Error('HTTP ' + r.status + ' → ' + url);
+  return r.json();
+}
+
+let REGISTRY;
 let LAYOUT;
+let SEL = 'kgp';
+/* digit-mode switch: off = layout's native digits (೦-೯), on = Western ASCII digits (0-9).
+   Maps CODE_MAP index → ASCII digit (Digit1=18 … Digit0=29, Digit6/5 swapped by CODE_MAP). */
+const DIGIT_ASCII = { 18:'1',19:'2',20:'3',21:'4',22:'6',23:'5',25:'9',26:'7',28:'8',29:'0' };
+let westDigits = false;
 try{
-  const res = await fetch('data/kannada_layout.json');
-  LAYOUT = await res.json();
-} catch(err){
-  document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;">Could not load <code>data/kannada_layout.json</code>. If you opened this file directly (file://), run a local static server instead — e.g. <code>python3 -m http.server</code> — then visit http://localhost:8000. On GitHub Pages this loads automatically.</p>';
+  REGISTRY = await fetchJson('data/layouts.json');
+  try{
+    const stored = localStorage.getItem('typingKannadaLayout');
+    if(stored && REGISTRY.layouts.some(l=>l.id === stored)) SEL = stored;
+    westDigits = localStorage.getItem('typingKannadaDigits') === '1';
+  }catch(e){ /* localStorage unavailable */ }
+  LAYOUT = await loadLayout(SEL);
+}catch(err){
+  document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;">Could not load the layout registry (<code>data/layouts.json</code>). If you opened this file directly (file://), run a local static server instead — e.g. <code>python3 -m http.server</code> — then visit http://localhost:8080. On GitHub Pages this loads automatically.</p>';
   throw err;
+}
+
+async function loadLayout(id){
+  const l = await fetchJson('data/layouts/' + id + '.json');
+  l.maxKeyLength = l.maxKeyLength || 1;
+  l.contextLength = l.contextLength || 0;
+  const reg = REGISTRY.layouts.find(r=>r.id === id);
+  if(reg && l.type === undefined) l.type = reg.type;
+  return l;
 }
 
 /* JS KeyboardEvent.code -> macOS ANSI virtual keycode used in the .keylayout file */
@@ -29,224 +63,7 @@ const CODE_MAP = {
   Backquote:50, Backspace:51
 };
 
-/* Every assigned codepoint in the Kannada block (U+0C80–U+0CFF). `keyboard:false`
-   marks historic letters and rare signs that have no physical key on the
-   KPRao/KGP/Nudi layout — rendered on the keyboard map as a reference strip. */
-const UNICODE_COVERAGE = [
-  { cp:'U+0C80', ch:'ಀ', name:'Spacing candrabindu', keyboard:false },
-  { cp:'U+0C81', ch:'ಁ', name:'Candrabindu', keyboard:false },
-  { cp:'U+0C82', ch:'ಂ', name:'Anusvara', keyboard:true },
-  { cp:'U+0C83', ch:'ಃ', name:'Visarga', keyboard:true },
-  { cp:'U+0C84', ch:'಄', name:'Siddham', keyboard:false },
-  { cp:'U+0C85', ch:'ಅ', name:'A', keyboard:true },
-  { cp:'U+0C86', ch:'ಆ', name:'AA', keyboard:true },
-  { cp:'U+0C87', ch:'ಇ', name:'I', keyboard:true },
-  { cp:'U+0C88', ch:'ಈ', name:'II', keyboard:true },
-  { cp:'U+0C89', ch:'ಉ', name:'U', keyboard:true },
-  { cp:'U+0C8A', ch:'ಊ', name:'UU', keyboard:true },
-  { cp:'U+0C8B', ch:'ಋ', name:'Vocalic R', keyboard:true },
-  { cp:'U+0C8C', ch:'ಌ', name:'Vocalic L', keyboard:false },
-  { cp:'U+0C8E', ch:'ಎ', name:'E', keyboard:true },
-  { cp:'U+0C8F', ch:'ಏ', name:'EE', keyboard:true },
-  { cp:'U+0C90', ch:'ಐ', name:'AI', keyboard:true },
-  { cp:'U+0C92', ch:'ಒ', name:'O', keyboard:true },
-  { cp:'U+0C93', ch:'ಓ', name:'OO', keyboard:true },
-  { cp:'U+0C94', ch:'ಔ', name:'AU', keyboard:true },
-  { cp:'U+0C95', ch:'ಕ', name:'Ka', keyboard:true },
-  { cp:'U+0C96', ch:'ಖ', name:'Kha', keyboard:true },
-  { cp:'U+0C97', ch:'ಗ', name:'Ga', keyboard:true },
-  { cp:'U+0C98', ch:'ಘ', name:'Gha', keyboard:true },
-  { cp:'U+0C99', ch:'ಙ', name:'Nga', keyboard:true },
-  { cp:'U+0C9A', ch:'ಚ', name:'Ca', keyboard:true },
-  { cp:'U+0C9B', ch:'ಛ', name:'Cha', keyboard:true },
-  { cp:'U+0C9C', ch:'ಜ', name:'Ja', keyboard:true },
-  { cp:'U+0C9D', ch:'ಝ', name:'Jha', keyboard:true },
-  { cp:'U+0C9E', ch:'ಞ', name:'Nya', keyboard:true },
-  { cp:'U+0C9F', ch:'ಟ', name:'Tta', keyboard:true },
-  { cp:'U+0CA0', ch:'ಠ', name:'Ttha', keyboard:true },
-  { cp:'U+0CA1', ch:'ಡ', name:'Dda', keyboard:true },
-  { cp:'U+0CA2', ch:'ಢ', name:'Ddha', keyboard:true },
-  { cp:'U+0CA3', ch:'ಣ', name:'Nna', keyboard:true },
-  { cp:'U+0CA4', ch:'ತ', name:'Ta', keyboard:true },
-  { cp:'U+0CA5', ch:'ಥ', name:'Tha', keyboard:true },
-  { cp:'U+0CA6', ch:'ದ', name:'Da', keyboard:true },
-  { cp:'U+0CA7', ch:'ಧ', name:'Dha', keyboard:true },
-  { cp:'U+0CA8', ch:'ನ', name:'Na', keyboard:true },
-  { cp:'U+0CAA', ch:'ಪ', name:'Pa', keyboard:true },
-  { cp:'U+0CAB', ch:'ಫ', name:'Pha', keyboard:true },
-  { cp:'U+0CAC', ch:'ಬ', name:'Ba', keyboard:true },
-  { cp:'U+0CAD', ch:'ಭ', name:'Bha', keyboard:true },
-  { cp:'U+0CAE', ch:'ಮ', name:'Ma', keyboard:true },
-  { cp:'U+0CAF', ch:'ಯ', name:'Ya', keyboard:true },
-  { cp:'U+0CB0', ch:'ರ', name:'Ra', keyboard:true },
-  { cp:'U+0CB1', ch:'ಱ', name:'Rra', keyboard:false },
-  { cp:'U+0CB2', ch:'ಲ', name:'La', keyboard:true },
-  { cp:'U+0CB3', ch:'ಳ', name:'Lla', keyboard:true },
-  { cp:'U+0CB5', ch:'ವ', name:'Va', keyboard:true },
-  { cp:'U+0CB6', ch:'ಶ', name:'Sha', keyboard:true },
-  { cp:'U+0CB7', ch:'ಷ', name:'Ssa', keyboard:true },
-  { cp:'U+0CB8', ch:'ಸ', name:'Sa', keyboard:true },
-  { cp:'U+0CB9', ch:'ಹ', name:'Ha', keyboard:true },
-  { cp:'U+0CBC', ch:'಼', name:'Nukta', keyboard:true },
-  { cp:'U+0CBD', ch:'ಽ', name:'Avagraha', keyboard:true },
-  { cp:'U+0CBE', ch:'ಾ', name:'Sign AA', keyboard:true },
-  { cp:'U+0CBF', ch:'ಿ', name:'Sign I', keyboard:true },
-  { cp:'U+0CC0', ch:'ೀ', name:'Sign II', keyboard:true },
-  { cp:'U+0CC1', ch:'ು', name:'Sign U', keyboard:true },
-  { cp:'U+0CC2', ch:'ೂ', name:'Sign UU', keyboard:true },
-  { cp:'U+0CC3', ch:'ೃ', name:'Sign ṛ', keyboard:true },
-  { cp:'U+0CC4', ch:'ೄ', name:'Sign ṝ', keyboard:true },
-  { cp:'U+0CC6', ch:'ೆ', name:'Sign E', keyboard:true },
-  { cp:'U+0CC7', ch:'ೇ', name:'Sign EE', keyboard:true },
-  { cp:'U+0CC8', ch:'ೈ', name:'Sign AI', keyboard:true },
-  { cp:'U+0CCA', ch:'ೊ', name:'Sign O', keyboard:true },
-  { cp:'U+0CCB', ch:'ೋ', name:'Sign OO', keyboard:true },
-  { cp:'U+0CCC', ch:'ೌ', name:'Sign AU', keyboard:true },
-  { cp:'U+0CCD', ch:'್', name:'Virama', keyboard:true },
-  { cp:'U+0CD5', ch:'ೕ', name:'Length mark', keyboard:false },
-  { cp:'U+0CD6', ch:'ೖ', name:'AI length mark', keyboard:false },
-  { cp:'U+0CDD', ch:'ೝ', name:'Nakaara pollu', keyboard:false },
-  { cp:'U+0CDE', ch:'ೞ', name:'Fa', keyboard:false },
-  { cp:'U+0CE0', ch:'ೠ', name:'Vocalic RR', keyboard:false },
-  { cp:'U+0CE1', ch:'ೡ', name:'Vocalic LL', keyboard:false },
-  { cp:'U+0CE2', ch:'ೢ', name:'Sign ḷ', keyboard:false },
-  { cp:'U+0CE3', ch:'ೣ', name:'Sign ḻ', keyboard:false },
-  { cp:'U+0CE6', ch:'೦', name:'0', keyboard:true },
-  { cp:'U+0CE7', ch:'೧', name:'1', keyboard:true },
-  { cp:'U+0CE8', ch:'೨', name:'2', keyboard:true },
-  { cp:'U+0CE9', ch:'೩', name:'3', keyboard:true },
-  { cp:'U+0CEA', ch:'೪', name:'4', keyboard:true },
-  { cp:'U+0CEB', ch:'೫', name:'5', keyboard:true },
-  { cp:'U+0CEC', ch:'೬', name:'6', keyboard:true },
-  { cp:'U+0CED', ch:'೭', name:'7', keyboard:true },
-  { cp:'U+0CEE', ch:'೮', name:'8', keyboard:true },
-  { cp:'U+0CEF', ch:'೯', name:'9', keyboard:true },
-  { cp:'U+0CF1', ch:'ೱ', name:'Jihvamuliya', keyboard:false },
-  { cp:'U+0CF2', ch:'ೲ', name:'Upadhmaniya', keyboard:false },
-  { cp:'U+0CF3', ch:'ೳ', name:'Combining anusvara', keyboard:false }
-];
-
-function controlLabel(v){
-  switch(v){
-    case '\t': return 'Tab';
-    case '\r': return '⏎';
-    case ' ':  return '␣';
-    case '\b': return '⌫';
-    case '\x1b': return 'Esc';
-    default: return v;
-  }
-}
-
-function getDisplayChar(cellEntry){
-  if(!cellEntry) return '';
-  if(cellEntry.type === 'output') return controlLabel(cellEntry.value);
-  const table = LAYOUT.actions[cellEntry.value];
-  const none = table && table.none;
-  if(!none) return '';
-  if('output' in none) return controlLabel(none.output);
-  if('next' in none) return LAYOUT.terminators[none.next] || none.next;
-  return '';
-}
-
-/* -- Historic letters: backquote ` is a dead key; ʻ`ʼ + <key> emits a historic
-   Kannada Unicode character that has no physical key on the KPRao/KGP/Nudi
-   layout. Every surface feeds keys through engine.press(), so sequences work
-   in Layout, Practice, Complex and Free tabs alike. -- */
-const HISTORIC_PREFIX_CODE = 50; // Backquote
-const HISTORIC_PREFIX = '\u0060';
-// keycode -> historic char: code*2 + (shift?1:0)
-const HISTORIC_SEQ = {
-  2:  '\u0C84', //  ` + s      → ಄ SIDDHAM
-  16: '\u0C81', //  ` + c      → ಁ CANDRABINDU
-  18: '\u0C8C', //  ` + v      → ಌ VOCALIC L
-  26: '\u0CE2', //  ` + w      → ೢ  SIGN Ḷ
-  27: '\u0CE3', //  ` + W      → ೣ  SIGN Ḻ
-  28: '\u0CD5', //  ` + e      → ೕ  LENGTH MARK
-  30: '\u0CB1', //  ` + r      → ಱ RRA
-  31: '\u0CE0', //  ` + R      → ೠ  VOCALIC RR
-  33: '\u0CD6', //  ` + Y      → ೖ  AI LENGTH MARK
-  64: '\u0CF2', //  ` + u      → ೲ  UPADHMANIYA
-  74: '\u0CDE', //  ` + l      → ೞ FA
-  75: '\u0CE1', //  ` + L      → ೡ  VOCALIC LL
-  76: '\u0CF1', //  ` + j      → ೱ  JIHVAMULIYA
-  90: '\u0CDD', //  ` + n      → ೝ  NAKAARA POLLU
-  92: '\u0CF3', //  ` + m      → ೳ  COMBINING ANUSVARA
-  93: '\u0C80'  //  ` + M      → ಀ SPACING CANDRABINDU
-};
-
-/* ---------------- Engine: mirrors the Ukelele action/terminator state machine ---------------- */
-class KannadaEngine{
-  constructor(){ this.state = 'none'; this.seq = null; }
-  reset(){ this.state = 'none'; this.seq = null; }
-  /* core layout press — no historic-sequence handling */
-  pressLayout(code, shift){
-    const km = shift ? LAYOUT.keymap1 : LAYOUT.keymap0;
-    const entry = km[code];
-    if(!entry) return '';
-    let out = '';
-    if(entry.type === 'output'){
-      if(this.state !== 'none'){
-        out += LAYOUT.terminators[this.state] || '';
-        this.state = 'none';
-      }
-      out += entry.value;
-      return out;
-    }
-    // action key
-    const table = LAYOUT.actions[entry.value];
-    if(!table) return '';
-    let when = table[this.state];
-    if(!when){
-      if(this.state !== 'none'){
-        out += LAYOUT.terminators[this.state] || '';
-        this.state = 'none';
-      }
-      when = table['none'];
-    }
-    if(when){
-      if('output' in when){ out += when.output; this.state = 'none'; }
-      else if('next' in when){ this.state = when.next; }
-    }
-    return out;
-  }
-  /* top-level press: resolves historic dead-key sequences first, otherwise
-     delegates to the layout state machine */
-  press(code, shift){
-    if(this.seq !== null){
-      const hit = HISTORIC_SEQ[code * 2 + (shift ? 1 : 0)];
-      this.seq = null;
-      if(hit) return hit;
-      return HISTORIC_PREFIX + this.pressLayout(code, shift);
-    }
-    if(code === HISTORIC_PREFIX_CODE && !shift){
-      this.seq = HISTORIC_PREFIX;
-      return '';
-    }
-    return this.pressLayout(code, shift);
-  }
-  /* returns true if a pending (uncommitted) state was cancelled rather than
-     needing an actual character deleted from the text buffer */
-  backspace(){
-    if(this.seq !== null){ this.seq = null; return true; }
-    if(this.state !== 'none'){ this.state = 'none'; return true; }
-    return false;
-  }
-  pendingPreview(){
-    if(this.seq !== null) return this.seq;
-    return this.state === 'none' ? '' : (LAYOUT.terminators[this.state] || '');
-  }
-  flush(){
-    if(this.seq !== null){ const out = this.seq; this.seq = null; return out; }
-    if(this.state !== 'none'){
-      const out = LAYOUT.terminators[this.state] || '';
-      this.state = 'none';
-      return out;
-    }
-    return '';
-  }
-}
-
-/* ---------------- Keyboard rendering ---------------- */
+/* Rows of the rendered US-ANSI keyboard (physical keycodes) */
 const ROWS = [
   [18,19,20,21,23,22,26,28,25,29,27,24],
   [12,13,14,15,17,16,32,34,31,35,33,30,42],
@@ -259,28 +76,380 @@ const QWERTY_LABEL = {
   0:'A',1:'S',2:'D',3:'F',5:'G',4:'H',38:'J',40:'K',37:'L',41:';',39:"'",
   6:'Z',7:'X',8:'C',9:'V',11:'B',45:'N',46:'M',43:',',47:'.',44:'/'
 };
+/* what shift produces on each US-ANSI code -> the actual character an IME
+   would receive (so we don't depend on OS key composition) */
+const US_SHIFT = {
+  18:'!',19:'@',20:'#',21:'$',23:'%',22:'^',26:'&',28:'*',25:'(',29:')',27:'_',
+  24:'+',33:'{',30:'}',42:'|',41:':',39:'"',43:'<',47:'>',44:'?',50:'~'
+};
 
-/* char -> human-readable keystrokes, e.g. "` + r" (rendered as <kbd> helpers) */
-const HISTORIC_STROKE = {};
-for(const key in HISTORIC_SEQ){
-  const code = Math.floor(key / 2);
-  const shift = key % 2 === 1;
-  const label = QWERTY_LABEL[code] || code;
-  HISTORIC_STROKE[HISTORIC_SEQ[key]] = '`' + (shift ? label.toUpperCase() : label.toLowerCase());
+function charFromCode(code, shift){
+  if(code === 49) return ' '; /* Space renders on every layout */
+  const base = QWERTY_LABEL[code];
+  if(base === undefined) return undefined;
+  if(!shift) return base.toLowerCase();
+  return US_SHIFT[code] || base.toUpperCase();
 }
+
+/* Every assigned codepoint in the Kannada block (U+0C80–U+0CFF), the master
+   reference list. Reachability per layout is computed dynamically by
+   buildCoverage() — the app never hardcodes which letters a layout types. */
+const UNICODE_COVERAGE = [
+  { cp:'U+0C80', ch:'ಀ', name:'Spacing candrabindu' },
+  { cp:'U+0C81', ch:'ಁ', name:'Candrabindu' },
+  { cp:'U+0C82', ch:'ಂ', name:'Anusvara' },
+  { cp:'U+0C83', ch:'ಃ', name:'Visarga' },
+  { cp:'U+0C84', ch:'಄', name:'Siddham' },
+  { cp:'U+0C85', ch:'ಅ', name:'A' },
+  { cp:'U+0C86', ch:'ಆ', name:'AA' },
+  { cp:'U+0C87', ch:'ಇ', name:'I' },
+  { cp:'U+0C88', ch:'ಈ', name:'II' },
+  { cp:'U+0C89', ch:'ಉ', name:'U' },
+  { cp:'U+0C8A', ch:'ಊ', name:'UU' },
+  { cp:'U+0C8B', ch:'ಋ', name:'Vocalic R' },
+  { cp:'U+0C8C', ch:'ಌ', name:'Vocalic L' },
+  { cp:'U+0C8E', ch:'ಎ', name:'E' },
+  { cp:'U+0C8F', ch:'ಏ', name:'EE' },
+  { cp:'U+0C90', ch:'ಐ', name:'AI' },
+  { cp:'U+0C92', ch:'ಒ', name:'O' },
+  { cp:'U+0C93', ch:'ಓ', name:'OO' },
+  { cp:'U+0C94', ch:'ಔ', name:'AU' },
+  { cp:'U+0C95', ch:'ಕ', name:'Ka' },
+  { cp:'U+0C96', ch:'ಖ', name:'Kha' },
+  { cp:'U+0C97', ch:'ಗ', name:'Ga' },
+  { cp:'U+0C98', ch:'ಘ', name:'Gha' },
+  { cp:'U+0C99', ch:'ಙ', name:'Nga' },
+  { cp:'U+0C9A', ch:'ಚ', name:'Ca' },
+  { cp:'U+0C9B', ch:'ಛ', name:'Cha' },
+  { cp:'U+0C9C', ch:'ಜ', name:'Ja' },
+  { cp:'U+0C9D', ch:'ಝ', name:'Jha' },
+  { cp:'U+0C9E', ch:'ಞ', name:'Nya' },
+  { cp:'U+0C9F', ch:'ಟ', name:'Tta' },
+  { cp:'U+0CA0', ch:'ಠ', name:'Ttha' },
+  { cp:'U+0CA1', ch:'ಡ', name:'Dda' },
+  { cp:'U+0CA2', ch:'ಢ', name:'Ddha' },
+  { cp:'U+0CA3', ch:'ಣ', name:'Nna' },
+  { cp:'U+0CA4', ch:'ತ', name:'Ta' },
+  { cp:'U+0CA5', ch:'ಥ', name:'Tha' },
+  { cp:'U+0CA6', ch:'ದ', name:'Da' },
+  { cp:'U+0CA7', ch:'ಧ', name:'Dha' },
+  { cp:'U+0CA8', ch:'ನ', name:'Na' },
+  { cp:'U+0CAA', ch:'ಪ', name:'Pa' },
+  { cp:'U+0CAB', ch:'ಫ', name:'Pha' },
+  { cp:'U+0CAC', ch:'ಬ', name:'Ba' },
+  { cp:'U+0CAD', ch:'ಭ', name:'Bha' },
+  { cp:'U+0CAE', ch:'ಮ', name:'Ma' },
+  { cp:'U+0CAF', ch:'ಯ', name:'Ya' },
+  { cp:'U+0CB0', ch:'ರ', name:'Ra' },
+  { cp:'U+0CB1', ch:'ಱ', name:'Rra' },
+  { cp:'U+0CB2', ch:'ಲ', name:'La' },
+  { cp:'U+0CB3', ch:'ಳ', name:'Lla' },
+  { cp:'U+0CB5', ch:'ವ', name:'Va' },
+  { cp:'U+0CB6', ch:'ಶ', name:'Sha' },
+  { cp:'U+0CB7', ch:'ಷ', name:'Ssa' },
+  { cp:'U+0CB8', ch:'ಸ', name:'Sa' },
+  { cp:'U+0CB9', ch:'ಹ', name:'Ha' },
+  { cp:'U+0CBC', ch:'಼', name:'Nukta' },
+  { cp:'U+0CBD', ch:'ಽ', name:'Avagraha' },
+  { cp:'U+0CBE', ch:'ಾ', name:'Sign AA' },
+  { cp:'U+0CBF', ch:'ಿ', name:'Sign I' },
+  { cp:'U+0CC0', ch:'ೀ', name:'Sign II' },
+  { cp:'U+0CC1', ch:'ು', name:'Sign U' },
+  { cp:'U+0CC2', ch:'ೂ', name:'Sign UU' },
+  { cp:'U+0CC3', ch:'ೃ', name:'Sign ṛ' },
+  { cp:'U+0CC4', ch:'ೄ', name:'Sign ṝ' },
+  { cp:'U+0CC6', ch:'ೆ', name:'Sign E' },
+  { cp:'U+0CC7', ch:'ೇ', name:'Sign EE' },
+  { cp:'U+0CC8', ch:'ೈ', name:'Sign AI' },
+  { cp:'U+0CCA', ch:'ೊ', name:'Sign O' },
+  { cp:'U+0CCB', ch:'ೋ', name:'Sign OO' },
+  { cp:'U+0CCC', ch:'ೌ', name:'Sign AU' },
+  { cp:'U+0CCD', ch:'್', name:'Virama' },
+  { cp:'U+0CD5', ch:'ೕ', name:'Length mark' },
+  { cp:'U+0CD6', ch:'ೖ', name:'AI length mark' },
+  { cp:'U+0CDD', ch:'ೝ', name:'Nakaara pollu' },
+  { cp:'U+0CDE', ch:'ೞ', name:'Fa' },
+  { cp:'U+0CE0', ch:'ೠ', name:'Vocalic RR' },
+  { cp:'U+0CE1', ch:'ೡ', name:'Vocalic LL' },
+  { cp:'U+0CE2', ch:'ೢ', name:'Sign ḷ' },
+  { cp:'U+0CE3', ch:'ೣ', name:'Sign ḻ' },
+  { cp:'U+0CE6', ch:'೦', name:'0' },
+  { cp:'U+0CE7', ch:'೧', name:'1' },
+  { cp:'U+0CE8', ch:'೨', name:'2' },
+  { cp:'U+0CE9', ch:'೩', name:'3' },
+  { cp:'U+0CEA', ch:'೪', name:'4' },
+  { cp:'U+0CEB', ch:'೫', name:'5' },
+  { cp:'U+0CEC', ch:'೬', name:'6' },
+  { cp:'U+0CED', ch:'೭', name:'7' },
+  { cp:'U+0CEE', ch:'೮', name:'8' },
+  { cp:'U+0CEF', ch:'೯', name:'9' },
+  { cp:'U+0CF1', ch:'ೱ', name:'Jihvamuliya' },
+  { cp:'U+0CF2', ch:'ೲ', name:'Upadhmaniya' },
+  { cp:'U+0CF3', ch:'ೳ', name:'Combining anusvara' }
+];
+const KANNADA_RE = /[\u0C80-\u0CFF]/;
+
+function controlLabel(v){
+  switch(v){
+    case '\t': return 'Tab';
+    case '\r': return '⏎';
+    case ' ':  return '␣';
+    case '\b': return '⌫';
+    case '\x1b': return 'Esc';
+    default: return v;
+  }
+}
+
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+/* ---------------- Engines ----------------
+   One unified engine object per surface; type switches behaviour. */
+
+function keymapEngine(lay){
+  return {
+    type:'keymap',
+    layout: () => lay,
+    state:'none', seq:null,
+    reset(){ this.state='none'; this.seq=null; },
+    pressLayout(code, shift){
+      const km = shift ? lay.keymap1 : lay.keymap0;
+      const entry = km && km[code];
+      if(!entry) return '';
+      let out = '';
+      if(entry.type === 'output'){
+        if(this.state !== 'none'){ out += lay.terminators[this.state] || ''; this.state='none'; }
+        out += entry.value;
+        return out;
+      }
+      const table = lay.actions[entry.value];
+      if(!table) return '';
+      let when = table[this.state];
+      if(!when){
+        if(this.state !== 'none'){ out += lay.terminators[this.state] || ''; this.state='none'; }
+        when = table['none'];
+      }
+      if(when){
+        if('output' in when){ out += when.output; this.state='none'; }
+        else if('next' in when){ this.state = when.next; }
+      }
+      return out;
+    },
+    press(code, shift){
+      if(this.seq !== null){
+        const seq = lay.historicSeq;
+        const hit = seq && seq[code * 2 + (shift ? 1 : 0)];
+        this.seq = null;
+        if(hit) return hit;
+        return (lay.historicPrefixChar !== undefined ? lay.historicPrefixChar : '\u0060') + this.pressLayout(code, shift);
+      }
+      if(lay.historicPrefixCode === code && !shift && lay.historicSeq){
+        this.seq = (lay.historicPrefixChar !== undefined ? lay.historicPrefixChar : '\u0060');
+        return '';
+      }
+      return this.pressLayout(code, shift);
+    },
+    backspace(){
+      if(this.seq !== null){ this.seq=null; return true; }
+      if(this.state !== 'none'){ this.state='none'; return true; }
+      return false;
+    },
+    pendingPreview(){
+      if(this.seq !== null) return this.seq;
+      return this.state === 'none' ? '' : (lay.terminators[this.state] || '');
+    },
+    flush(){
+      if(this.seq !== null){ const out=this.seq; this.seq=null; return out; }
+      if(this.state !== 'none'){ const out = lay.terminators[this.state] || ''; this.state='none'; return out; }
+      return '';
+    }
+  };
+}
+
+/* faithful port of jquery.ime transliterate() + keypress flow */
+function imeTransliterate(layout, input, context, altGr, shift){
+  const patterns = altGr ? (layout.patterns_x || [])
+    : ((shift && (layout.patterns_shift || []).length)
+        ? layout.patterns_shift.concat(layout.patterns || [])
+        : (layout.patterns || []));
+  for(const rule of patterns){
+    const re = new RegExp(rule[0] + '$');
+    if(re.test(input)){
+      if(rule.length === 3){
+        if(new RegExp(rule[1] + '$').test(context)){
+          return { noop:false, output: input.replace(re, rule[rule.length-1]) };
+        }
+      }else{
+        return { noop:false, output: input.replace(re, rule[rule.length-1]) };
+      }
+    }
+  }
+  return { noop:true, output: input };
+}
+
+function imeEngine(lay){
+  return {
+    type:'ime',
+    layout: () => lay,
+    ctx:'',
+    reset(){ this.ctx = ''; },
+    /* buffer = current composed text; ch = the character this keypress
+       produced on a US-ANSI keyboard; returns the new buffer. */
+    processChar(buffer, ch, altGr, shift){
+      const input = buffer.slice(-lay.maxKeyLength);
+      const candidate = input + ch;
+      const res = imeTransliterate(lay, candidate, this.ctx, altGr, shift);
+      this.ctx = (this.ctx + ch).slice(-lay.contextLength);
+      if(res.noop) return buffer + ch;
+      return buffer.slice(0, buffer.length - input.length) + res.output;
+    },
+    backspace(){ return false; },
+    pendingPreview(){ return ''; },
+    flush(){ return ''; }
+  };
+}
+
+function createEngine(){
+  const lay = LAYOUT;
+  return lay.type === 'ime' ? imeEngine(lay) : keymapEngine(lay);
+}
+
+/* ---------------- Per-layout coverage metadata ----------------
+   layer of each Kannada char: 'base' | 'backquote' | 'altgr' | 'shift' | null,
+   plus a short human stroke ('`+r', '⌥+H', '+', …) where one exists. */
+function strokeLabel(input){
+  return ('' + input).replace(/\\(.)/g, '$1');
+}
+
+function buildCoverage(){
+  const map = new Map();       // char -> {layer, stroke}
+  const add = (ch, layer, stroke) => {
+    if(ch === undefined || !KANNADA_RE.test(ch)) return;
+    if(KANNADA_RE.test(ch)){
+      const prev = map.get(ch);
+      if(prev && prev.layer === 'base') return;   // base wins
+      map.set(ch, { layer, stroke });
+    }
+  };
+
+  if(LAYOUT.type === 'keymap'){
+    for(const row of [LAYOUT.keymap0, LAYOUT.keymap1]){
+      for(const entry of Object.values(row || {})){
+        if(entry && entry.type === 'output') Array.from(entry.value).forEach(c=> add(c, 'base', ''));
+      }
+    }
+    for(const key in (LAYOUT.actions||{})){
+      const table = LAYOUT.actions[key];
+      for(const state in table){
+        const br = table[state];
+        if(br && br.output !== undefined) Array.from(br.output).forEach(c=> add(c, 'base', ''));
+      }
+    }
+    for(const term of Object.values(LAYOUT.terminators||{})){ if(term) Array.from(term).forEach(c=> add(c, 'base', '')); }
+    // historic dead-key layer (backquote ` + key)
+    const seq = LAYOUT.historicSeq;
+    if(seq){
+      for(const key in seq){
+        const code = Math.floor(+key / 2);
+        const shift = (+key) % 2 === 1;
+        const label = (QWERTY_LABEL[code] || code) + (code !== undefined ? '' : '');
+        const stroke = (LAYOUT.historicPrefixChar || '\u0060') + (shift ? label.toUpperCase() : label.toLowerCase());
+        add(seq[key], 'backquote', stroke);
+      }
+    }
+    return map;
+  }
+
+  // ime: greedy literal-rule detection for dedicated keys
+  const rules = [
+    { list: LAYOUT.patterns || [], layer:'base', prefix:'' },
+    { list: LAYOUT.patterns_x || [], layer:'altgr', prefix:'⌥+' },
+    { list: LAYOUT.patterns_shift || [], layer:'shift', prefix:'⇧+' }
+  ];
+  for(const grp of rules){
+    for(const rule of grp.list){
+      const rep = rule[rule.length - 1];
+      if(typeof rep !== 'string' || rep.indexOf('$') !== -1) continue; // composition rule, not a dedicated key
+      if(rule.length === 3 && rule[1]) continue; // context-gated → not a plain dedicated key
+      Array.from(rep).forEach(ch => add(ch, grp.layer, (grp.prefix + strokeLabel(rule[0]))));
+    }
+  }
+  return map;
+}
+
+let COVERAGE = buildCoverage();
+function refreshCoverage(){ COVERAGE = buildCoverage(); }
+
+/* ---------------- Keyboard rendering ---------------- */
+function getDisplayChar(cellEntry){
+  if(!cellEntry) return '';
+  if(cellEntry.type === 'output') return controlLabel(cellEntry.value);
+  const table = LAYOUT.actions[cellEntry.value];
+  const none = table && table.none;
+  if(!none) return '';
+  if('output' in none) return controlLabel(none.output);
+  if('next' in none) return LAYOUT.terminators[none.next] || none.next;
+  return '';
+}
+
+function imeKeyChar(input){
+  for(const rule of (LAYOUT.patterns || [])){
+    const rep = rule[rule.length - 1];
+    if(typeof rep !== 'string' || rep.indexOf('$') !== -1) continue;
+    const plain = rule[0].replace(/\\(.)/g, '$1');
+    if(plain.length === 1 && plain === input) return controlLabel(rep.length === 1 ? rep : rep);
+  }
+  return '';
+}
+
+const SPECIAL_LABELS = { 48:'⇥ Tab', 49:'␣ space', 36:'↩ return', 51:'⌫ backspace' };
 
 function buildKeyEl(code, wide, isSpace){
   const el = document.createElement('div');
   el.className = 'key' + (wide ? ' wide' : '') + (isSpace ? ' space' : '');
   el.dataset.code = code;
-  const base = getDisplayChar(LAYOUT.keymap0[String(code)]);
-  const shifted = getDisplayChar(LAYOUT.keymap1[String(code)]);
+  const digitOverride = westDigits && DIGIT_ASCII[code] !== undefined;
+  let base = '', shifted = '';
+  if(LAYOUT.type === 'keymap'){
+    base = digitOverride ? DIGIT_ASCII[code] : getDisplayChar(LAYOUT.keymap0[String(code)]);
+    shifted = digitOverride ? (US_SHIFT[code] || DIGIT_ASCII[code]) : getDisplayChar(LAYOUT.keymap1[String(code)]);
+  }else if(digitOverride){
+    base = DIGIT_ASCII[code];
+    shifted = US_SHIFT[code] || DIGIT_ASCII[code];
+  }else{
+    base = imeKeyChar(charFromCode(code, false) || '');
+    shifted = imeKeyChar(charFromCode(code, true) || '');
+  }
+  if(!base && SPECIAL_LABELS[code]) base = SPECIAL_LABELS[code];
   el.innerHTML = `
     <div class="top">${shifted}</div>
     <div class="main">${base}</div>
     <div class="qwerty">${QWERTY_LABEL[code] || ''}</div>
   `;
   return el;
+}
+
+function renderReferenceRow(){
+  const refs = Array.from(COVERAGE.entries()).filter(([,m])=> m.layer !== 'base');
+  if(!refs.length) return null;
+  const hasBackquote = refs.some(([,m])=> m.layer === 'backquote');
+  const hasAlt = refs.some(([,m])=> m.layer === 'altgr');
+  let label;
+  if(refs.every(([,m])=> m.layer === 'backquote')) label = `ಐತಿಹಾಸಿಕ · <b>${refs.length}</b> — type <kbd>\`</kbd> then the key:`;
+  else if(refs.every(([,m])=> m.layer === 'altgr')) label = `ಐತಿಹಾಸಿಕ · <b>${refs.length}</b> — hold <kbd>⌥</kbd> and press the key:`;
+  else label = `ವಿಶೇಷ & ಐತಿಹಾಸಿಕ · <b>${refs.length}</b> — type as shown:`;
+  const row = document.createElement('div');
+  row.className = 'kbd-ref-row';
+  row.innerHTML = `<span class="kbd-ref-label">${label}</span>` +
+    refs.map(([ch, m])=>{
+      const u = UNICODE_COVERAGE.find(x=>x.ch === ch);
+      const glyph = (ch === '\u200c' || ch === '\u200d') ? (ch === '\u200d' ? 'ZWJ' : 'ZWNJ') : ch;
+      return `<span class="kbd-ref" title="U+${((u&&u.cp)||'??').slice(2)} ${u ? 'KANNADA ' + u.name : ''} — ${m.stroke || 'no stroke'}"><b class="ref-glyph">${glyph}</b>` +
+        (m.stroke ? `<span class="ref-stroke"><kbd>${escapeHtml(m.stroke)}</kbd></span>` : '') +
+        `</span>`;
+    }).join('');
+  return row;
 }
 
 function renderKeyboard(container){
@@ -293,32 +462,13 @@ function renderKeyboard(container){
   });
   const bottomRow = document.createElement('div');
   bottomRow.className = 'kbd-row';
-  bottomRow.appendChild(buildKeyEl(48, true));   // Tab
+  bottomRow.appendChild(buildKeyEl(48, true));     // Tab
   bottomRow.appendChild(buildKeyEl(49, false, true)); // Space
-  bottomRow.appendChild(buildKeyEl(36, true));   // Return
-  bottomRow.appendChild(buildKeyEl(51, true));   // Backspace
+  bottomRow.appendChild(buildKeyEl(36, true));     // Return
+  bottomRow.appendChild(buildKeyEl(51, true));     // Backspace
   container.appendChild(bottomRow);
-
   const refRow = renderReferenceRow();
   if(refRow) container.appendChild(refRow);
-}
-
-/* Historic letters and rare signs that have no physical key on the
-   KPRao/KGP/Nudi layout — a compact reference under the keyboard map. Each is
-   still typeable: backquote ` is a dead key, then the shown key. */
-function renderReferenceRow(){
-  const refs = UNICODE_COVERAGE.filter(u=>!u.keyboard);
-  if(!refs.length) return null;
-  const row = document.createElement('div');
-  row.className = 'kbd-ref-row';
-  row.innerHTML = `<span class="kbd-ref-label">ಐತಿಹಾಸಿಕ · <b>${refs.length}</b> — type <kbd>\`</kbd> then the key:</span>` +
-    refs.map(u=>{
-      const stroke = HISTORIC_STROKE[u.ch];
-      return `<span class="kbd-ref" title="U+${u.cp.slice(2)} KANNADA ${u.name}"><b class="ref-glyph">${u.ch}</b>` +
-        (stroke ? `<span class="ref-stroke"><kbd>${stroke}</kbd></span>` : `<span class="ref-code">${u.cp.slice(2)}</span>`) +
-        `</span>`;
-    }).join('');
-  return row;
 }
 
 function flashKey(container, code, shift){
@@ -328,8 +478,6 @@ function flashKey(container, code, shift){
   if(shift) el.classList.add('shifted');
   setTimeout(()=>{ el.classList.remove('pressed'); el.classList.remove('shifted'); }, 140);
 }
-
-/* highlight across every rendered keyboard instance on the page */
 function flashAll(code, shift){
   document.querySelectorAll('.keyboard').forEach(k=> flashKey(k, code, shift));
 }
@@ -351,7 +499,7 @@ function popGrapheme(str){
 /* ---------------- Typing surface wiring ---------------- */
 function attachTypingSurface(el, kbContainer, opts){
   opts = opts || {};
-  const engine = new KannadaEngine();
+  let engine = createEngine();
   let buffer = '';
 
   function render(){
@@ -366,14 +514,10 @@ function attachTypingSurface(el, kbContainer, opts){
     if(opts.onChange) opts.onChange(buffer, engine);
   }
 
-  function escapeHtml(s){
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-  }
-
   el.addEventListener('click', ()=> el.focus());
 
   function handleKey(e){
-    if(e.ctrlKey || e.metaKey || e.altKey) return;
+    if(e.ctrlKey || e.metaKey) return;
     if(e.key === 'Tab' || e.key === 'Escape') return; // let browser handle focus/escape
 
     if(e.code === 'Backspace'){
@@ -388,12 +532,23 @@ function attachTypingSurface(el, kbContainer, opts){
     const code = CODE_MAP[e.code];
     if(code === undefined) return; // arrows etc. – let browser handle
     e.preventDefault();
-    const shift = e.shiftKey;
-    const emitted = engine.press(code, shift);
-    if(emitted) buffer += emitted.replace(/\r/g, '\n');
-    flashAll(code, shift);
-    if(kbContainer){
-      // reflect current pending state visually as "shifted" tint on nothing extra – flashAll already covers press feedback
+
+    if(westDigits && DIGIT_ASCII[code] !== undefined){
+      buffer += engine.flush() + DIGIT_ASCII[code];
+      flashAll(code, e.shiftKey);
+      render();
+      return;
+    }
+
+    if(engine.type === 'ime'){
+      const ch = charFromCode(code, e.shiftKey);
+      if(ch !== undefined) buffer = engine.processChar(buffer, ch, e.altKey, e.shiftKey);
+      flashAll(code, e.shiftKey);
+    }else{
+      const shift = e.shiftKey;
+      const emitted = engine.press(code, shift);
+      if(emitted) buffer += emitted.replace(/\r/g, '\n');
+      flashAll(code, shift);
     }
     render();
   }
@@ -404,10 +559,59 @@ function attachTypingSurface(el, kbContainer, opts){
   return {
     getText: ()=> buffer,
     setText: (t)=> { buffer = t; engine.reset(); render(); },
+    setEngine(){ engine = createEngine(); engine.reset(); buffer=''; render(); },
+    reset(){ buffer = ''; engine.reset(); render(); },
     focusEl: el,
-    engine,
+    engineRef: ()=> engine,
     handleKey
   };
+}
+
+/* ============================================================
+   Layout switching
+   ============================================================ */
+function setLayout(id){
+  SEL = id;
+  loadLayout(id).then(l=>{
+    LAYOUT = l;
+    refreshCoverage();
+    try{ localStorage.setItem('typingKannadaLayout', id); }catch(e){}
+    syncLayoutUI();
+  });
+}
+
+function syncLayoutUI(){
+  try{
+    // selector label
+    const el = document.getElementById('layoutSelect');
+    if(el) el.value = SEL;
+    // description line
+    const reg = REGISTRY.layouts.find(l=>l.id === SEL);
+    const desc = document.getElementById('layoutDesc');
+    if(desc) desc.textContent = (reg && reg.description) || '';
+    // keyboard + surfaces
+    renderKeyboard(kbLayout);
+    renderKeyboard(kbPractice);
+    layoutSurface.setEngine();
+    practiceSurface.setEngine();
+    freeSurface.setEngine();
+    resetShiftToggle();
+    renderComplex();
+    renderUnicode();
+    renderReview();
+  }catch(err){ console.error('syncLayoutUI error:', err); }
+}
+
+function setWestDigits(on){
+  westDigits = !!on;
+  try{ localStorage.setItem('typingKannadaDigits', westDigits ? '1' : '0'); }catch(e){}
+  const btn = document.getElementById('digitToggle');
+  if(btn){
+    btn.classList.toggle('on', westDigits);
+    btn.setAttribute('aria-checked', westDigits ? 'true' : 'false');
+  }
+  renderKeyboard(kbLayout);
+  renderKeyboard(kbPractice);
 }
 
 /* ============================================================
@@ -427,6 +631,7 @@ document.querySelectorAll('nav.tabs button').forEach(btn=>{
    ============================================================ */
 const kbLayout = document.getElementById('kbLayout');
 renderKeyboard(kbLayout);
+
 const layoutSurface = attachTypingSurface(document.getElementById('surfaceLayout'), kbLayout, {
   placeholder: 'Start typing — the board below mirrors your physical keyboard live →'
 });
@@ -443,19 +648,52 @@ document.addEventListener('keydown', (e)=>{
   layoutSurface.handleKey(e);
 });
 
-let shiftLayerOn = false;
+let shiftToggled = false;
 document.getElementById('shiftToggle').addEventListener('click', function(){
-  shiftLayerOn = !shiftLayerOn;
-  this.classList.toggle('on', shiftLayerOn);
-  kbLayout.querySelectorAll('.key').forEach(k=>{
-    k.classList.toggle('shifted', shiftLayerOn);
-    const main = k.querySelector('.main');
-    const top = k.querySelector('.top');
-    if(shiftLayerOn){
-      const tmp = main.textContent; main.textContent = top.textContent; top.textContent = tmp;
-    }
+  shiftToggled = !shiftToggled;
+  this.classList.toggle('on', shiftToggled);
+  [kbLayout, kbPractice].forEach(kb=>{
+    kb.querySelectorAll('.key').forEach(k=>{
+      k.classList.toggle('shifted', shiftToggled);
+      const main = k.querySelector('.main');
+      const top = k.querySelector('.top');
+      if(shiftToggled && main && top){
+        const tmp = main.textContent; main.textContent = top.textContent; top.textContent = tmp;
+      }
+    });
   });
 });
+function resetShiftToggle(){
+  if(!shiftToggled) return;
+  shiftToggled = false;
+  const btn = document.getElementById('shiftToggle');
+  btn.classList.remove('on');
+  [kbLayout, kbPractice].forEach(kb=>{
+    kb.querySelectorAll('.key').forEach(k=>{
+      k.classList.remove('shifted');
+      const main = k.querySelector('.main');
+      const top = k.querySelector('.top');
+      if(main && top){
+        const tmp = main.textContent; main.textContent = top.textContent; top.textContent = tmp;
+      }
+    });
+  });
+}
+
+/* Layout picker */
+function buildPicker(){
+  const sel = document.getElementById('layoutSelect');
+  if(!sel || !REGISTRY) return;
+  sel.innerHTML = '';
+  REGISTRY.layouts.forEach(l=>{
+    const opt = document.createElement('option');
+    opt.value = l.id;
+    opt.textContent = l.name;
+    sel.appendChild(opt);
+  });
+  sel.value = SEL;
+  sel.addEventListener('change', ()=> setLayout(sel.value));
+}
 
 /* ============================================================
    Practice tab — typing tutor
@@ -646,85 +884,68 @@ function renderCodepoints(str){
   }).join('');
 }
 function renderKeys(seq){
-  return seq.map(([label, shift])=>`<span class="cx-key${shift?' shift':''}">${label}</span>`).join('');
+  return seq.map(entry=>{
+    if(typeof entry === 'string') return `<span class="cx-key">${escapeHtml(entry)}</span>`;
+    if(Array.isArray(entry)) return `<span class="cx-key${entry[1]?' shift':''}">${escapeHtml(entry[0])}</span>`;
+    if(entry && typeof entry === 'object') return `<span class="cx-key alt">⌥ ${escapeHtml(entry.label)}</span>`;
+    return '';
+  }).join('');
 }
 
-const COMPLEX_EXAMPLES = [
-  {
-    tag:'Traditional ligature', word:'ಕ್ಷಣ', gloss:'kṣaṇa — "moment"',
-    built:'ಕ + ್ (virama) + ಷ + ಣ — ಕ+ಷ is one of two traditional conjuncts many fonts render as a single fused glyph rather than a visible stack.',
-    keys:[['K',false],['F',false],['X',false],['N',true]]
-  },
-  {
-    tag:'Traditional ligature', word:'ಜ್ಞಾನ', gloss:'jñāna — "knowledge"',
-    built:'ಜ + ್ (virama) + ಞ + ಾ (long ā matra) + ನ — ಜ+ಞ is the other classic fused ligature (jña).',
-    keys:[['J',false],['F',false],['Z',false],['A',true],['N',false]]
-  },
-  {
-    tag:'Consonant cluster', word:'ಸ್ಪರ್ಧೆ', gloss:'spardhe — "competition"',
-    built:'ಸ + ್ + ಪ, then ರ + ್ + ಧ + ೆ — two separate conjuncts back to back (ಸ್ಪ and ರ್ಧ).',
-    keys:[['S',false],['F',false],['P',false],['R',false],['F',false],['D',true],['E',false]]
-  },
-  {
-    tag:'Consonant cluster', word:'ಕ್ರಮ', gloss:'krama — "method, order"',
-    built:'ಕ + ್ + ರ + ಮ — a consonant followed by ರ after virama often renders with a distinct "ra-kar" joined form rather than a plain stack.',
-    keys:[['K',false],['F',false],['R',false],['M',false]]
-  },
-  {
-    tag:'Reph-style cluster', word:'ಕರ್ನಾಟಕ', gloss:'Karnataka',
-    built:'ಕ + ರ + ್ (virama, forms ರ್) + ನ + ಾ + ಟ + ಕ — the ರ್ that ends the syllable and starts the next is the everyday case that first surfaced the Shift+F bug.',
-    keys:[['K',false],['R',false],['F',false],['N',false],['A',true],['Q',false],['K',false]]
-  },
-  {
-    tag:'Vocalic matra', word:'ಕೃಷಿ', gloss:'kṛṣi — "agriculture"',
-    built:'ಕ + ೃ (vocalic-r matra, Shift+R) + ಷ + ಿ (short i matra) — the ಋ-family vowel signs use their own dedicated pending state.',
-    keys:[['K',false],['R',true],['X',false],['I',false]]
-  },
-  {
-    tag:'Nukta form', word:'ಕ಼', gloss:'ka + nukta (not a standalone word — a technical demo)',
-    built:'ಕ + ವಿಶೇಷ (Shift+X, the nukta/special-mark key) — used for sounds borrowed from other languages/scripts that plain Kannada consonants don\'t cover.',
-    keys:[['K',false],['X',true]]
-  },
-  {
-    tag:'Explicit virama · fixed', word:'ಕಾರ್‌', gloss:'"car", forced to stand alone (won\'t ligate with whatever follows)',
-    built:'ಕ + ಾ + ರ + ್ + ್ (virama pressed twice) — this is the exact pattern that used to produce a stray duplicated virama; it\'s now a clean, generalized "don\'t ligate this consonant" instruction that works the same way on all 34 consonants, not just ಕ.',
-    keys:[['K',false],['A',true],['R',false],['F',false],['F',false]]
-  }
-];
-
 const complexGridEl = document.getElementById('complexGrid');
-COMPLEX_EXAMPLES.forEach(ex=>{
-  const card = document.createElement('div');
-  card.className = 'cx-card';
-  card.innerHTML = `
-    <div class="cx-tag">${ex.tag}</div>
-    <div class="cx-word">${ex.word}</div>
-    <div class="cx-gloss">${ex.gloss}</div>
-    <div class="cx-row"><b>Built from:</b> ${ex.built}</div>
-    <div class="cx-row"><b>Type this:</b></div>
-    <div class="cx-keys">${renderKeys(ex.keys)}</div>
-    <div class="cx-codepoints">${renderCodepoints(ex.word)}</div>
-  `;
-  complexGridEl.appendChild(card);
-});
+function renderComplex(){
+  complexGridEl.innerHTML = '';
+  (LAYOUT.examples || []).forEach(ex=>{
+    const card = document.createElement('div');
+    card.className = 'cx-card';
+    card.innerHTML = `
+      <div class="cx-tag">${escapeHtml(ex.tag)}</div>
+      <div class="cx-word">${escapeHtml(ex.word)}</div>
+      <div class="cx-gloss">${escapeHtml(ex.gloss)}</div>
+      <div class="cx-row"><b>Built from:</b> ${escapeHtml(ex.built)}</div>
+      <div class="cx-row"><b>Type this:</b></div>
+      <div class="cx-keys">${renderKeys(ex.keys)}</div>
+      <div class="cx-codepoints">${renderCodepoints(ex.word)}</div>
+    `;
+    complexGridEl.appendChild(card);
+  });
+}
 
 /* ---------- Full Kannada Unicode block coverage (U+0C80–U+0CFF) ---------- */
 const unicodeGridEl = document.getElementById('unicodeGrid');
-if(unicodeGridEl){
-  const onKeyboard = UNICODE_COVERAGE.filter(u=>u.keyboard).length;
-  const coverageNote = document.createElement('div');
-  coverageNote.className = 'coverage-note';
-  coverageNote.innerHTML = `<b>ಒಟ್ಟು ${UNICODE_COVERAGE.length}</b> assigned codepoints in the Kannada block — <b>${onKeyboard}</b> reachable on this keyboard, <b>${UNICODE_COVERAGE.length - onKeyboard}</b> historic/sign characters typeable via <kbd>\`</kbd> + key sequences (shown below):`;
-  unicodeGridEl.parentNode.insertBefore(coverageNote, unicodeGridEl);
+function coverageNoteEl(){
+  let baseN = 0, histN = 0, noneN = 0;
   UNICODE_COVERAGE.forEach(u=>{
+    const m = COVERAGE.get(u.ch);
+    if(!m){ noneN++; }
+    else if(m.layer === 'base'){ baseN++; }
+    else { histN++; }
+  });
+  const note = document.createElement('div');
+  note.className = 'coverage-note';
+  note.innerHTML = `<b>ಒಟ್ಟು ${UNICODE_COVERAGE.length}</b> assigned codepoints in the Kannada block — <b>${baseN}</b> on this layout's keys · <b>${histN}</b> historic/special via a modifier (shown below) · <b>${noneN}</b> no dedicated key (compose by typing):`;
+  return note;
+}
+function renderUnicode(){
+  unicodeGridEl.innerHTML = '';
+  unicodeGridEl.parentNode.insertBefore(coverageNoteEl(), unicodeGridEl);
+  UNICODE_COVERAGE.forEach(u=>{
+    const m = COVERAGE.get(u.ch);
     const cell = document.createElement('div');
-    cell.className = 'u-cell' + (u.keyboard ? '' : ' u-ref');
-    const stroke = HISTORIC_STROKE[u.ch];
-    cell.title = stroke ? `${u.cp} KANNADA ${u.name} — type ${stroke}` : `${u.cp} KANNADA ${u.name}`;
+    cell.className = 'u-cell' + (m && m.layer === 'base' ? '' : ' u-ref');
+    let badge = 'no key';
+    if(m){
+      if(m.layer === 'base') badge = 'ಕೀ · layout';
+      else if(m.layer === 'backquote') badge = 'hist · ` + key';
+      else if(m.layer === 'altgr') badge = 'hist · ⌥ + key';
+      else if(m.layer === 'shift') badge = 'hist · ⇧ + key';
+    }
+    const show = (m&&m.stroke) ? `<span class="u-stroke"><kbd>${escapeHtml(m.stroke)}</kbd></span>` : `<span class="u-code">${u.cp}</span>`;
+    cell.title = (m && m.stroke) ? `${u.cp} KANNADA ${u.name} — type ${m.stroke}` : `${u.cp} KANNADA ${u.name}${m ? '' : ' — no dedicated key; compose by typing'}`;
     cell.innerHTML = `
       <span class="u-glyph">${u.ch}</span>
-      ${stroke ? `<span class="u-stroke"><kbd>${stroke}</kbd></span>` : `<span class="u-code">${u.cp}</span>`}
-      <span class="u-badge">${u.keyboard ? 'ಕೀ · layout' : 'hist · ` + key'}</span>
+      ${show}
+      <span class="u-badge">${badge}</span>
     `;
     unicodeGridEl.appendChild(cell);
   });
@@ -745,72 +966,27 @@ document.getElementById('copyFreeBtn').addEventListener('click', ()=>{
 /* ============================================================
    Review tab content
    ============================================================ */
-const FINDINGS = [
-  {
-    sev:'ok', sevLabel:'Fixed · was critical',
-    title:'ZWJ/ZWNJ garbage bug — reported live, now fixed',
-    body:`<p>Real-world repro: typing <code>ಕಾರ್ನಲ್ಲಿ</code> using <code>R</code> → <code>F</code> (virama) → <code>Shift+F</code> produced <code>ಕಾರ್‌್ನಲ್ಲಿ</code> — a duplicated virama with a stray ZWNJ wedged in between. Root cause was two of the findings below combining: Shift+F was a blind literal key that always stapled on ZWNJ+virama regardless of context, and the "type virama twice to force a standalone consonant" feature only existed for ಕ, so every other consonant fell through to broken behaviour.</p>
-    <p><b>Fix applied:</b> Shift+F is no longer a separate literal-output key — it now routes through the exact same context-aware virama action as the base key. The "double-virama forces an explicit, non-ligating consonant + ZWNJ" behaviour is generalized from just ಕ to all 34 consonants (33 new state transitions + 33 new terminators, verified programmatically). Re-running the original repro sequence now produces a clean, meaningful result — an intentionally standalone ರ್ — instead of garbage. Regular typing (single virama presses, ordinary conjuncts) is unaffected; see the Complex Characters tab for a live before/after.</p>
-    <p>Note: this fix lives in this web tutor's copy of the layout data. The upstream <code>.keylayout</code> source still has the original blind Shift+F mapping and the ಕ-only special case — apply the same generalization there if you want the real installed keyboard to match.</p>`
-  },
-  {
-    sev:'critical', sevLabel:'Fix before shipping',
-    title:'Two malformed XML entity references break the layout file',
-    body:`<p>Two <code>output</code> attributes reference an undefined entity <code>&amp;x200c;</code> / <code>&amp;x200D;</code> — missing the <code>#</code> that makes it a numeric character reference. As written, this is not valid XML: a strict parser (and some build/import tools) will reject the file outright rather than silently treating it as the intended zero-width joiner / non-joiner.</p>
-    <pre>Line ~367:  &lt;key code="3" output="&amp;x200c;"/&gt;                (Caps layer, F key)
-Line ~1673: &lt;when state="none" output="&amp;x200D;"/&gt;   (nukta/ವಿಶೇಷ action)</pre>
-    <p>Fix: change both to proper numeric character references — <code>&amp;#x200c;</code> (ZWNJ) and <code>&amp;#x200D;</code> (ZWJ). This tutor's engine patches both automatically so the demo above behaves correctly, but the source <code>.keylayout</code> file itself still needs the correction before it's recompiled into an installer.</p>`
-  },
-  {
-    sev:'warn', sevLabel:'Dead code',
-    title:'Shift+Space is wired to an unreachable dead-key state machine',
-    body:`<p>The <code>Shift+Space</code> key (Caps-layer index 1, code 49) is mapped to an action ("5") with five branches for <code>State 1</code> through <code>State 5</code>, intended to type spacing accent marks (´ &#96; ˆ ¨ ˜). But nothing anywhere in the file ever transitions the state machine into <code>State 1</code>–<code>State 5</code> — no key's <code>next</code> ever produces those names. The branches can never fire.</p>
-    <p>In practice, <code>Shift+Space</code> today just always outputs a plain space — the dead branches are inert, but they're also confusing for anyone maintaining the layout later, and they hint at an unfinished feature (a dead-key row for diacritics) that never got wired up.</p>
-    <p>Recommendation: either remove the unused branches and simplify <code>Shift+Space</code> to a plain output key, or finish the intended feature by adding the missing state transitions.</p>`
-  },
-  {
-    sev:'ok', sevLabel:'Fixed · was "inconsistency"',
-    title:'The "F" key (virama/nukta slot) used to behave differently on Shift vs Caps Lock',
-    body:`<p>Originally, physical key <code>F</code> (code 3) carried three different behaviours across layers that were meant to mirror each other — base gave a context-aware virama, Shift blindly stapled on ZWNJ+virama, Caps Lock gave ZWNJ alone. Folded into the fix above: Shift+F now calls the same action as the base key, so all three layers are consistent (Caps Lock still needs the same treatment applied to its own key entry if you want full parity — it currently still uses the old literal-output style).</p>`
-  },
-  {
-    sev:'ok', sevLabel:'Fixed · was "incomplete feature"',
-    title:'Explicit "visible virama" (double-halant → ZWNJ) now works on all 34 consonants, not just ಕ',
-    body:`<p>Typing a consonant then the virama key twice now forces that consonant to render standalone (with a ZWNJ) instead of ligating into a conjunct with whatever follows — generalized from the original ಕ-only special case. See the Complex Characters tab for a worked example on ರ.</p>`
-  },
-  {
-    sev:'ok', sevLabel:'Verified sound',
-    title:'Vowel-sign combination logic is complete and internally consistent',
-    body:`<p>Every independent vowel action (ಆ ಇ ಈ ಉ ಊ ಋ ಎ ಏ ಐ ಒ ಓ ಔ) defines a branch for all 34 consonant states, and every state that a key transitions into via <code>next</code> has a matching <code>&lt;terminators&gt;</code> entry — verified programmatically across all 84 actions / 70 terminator states while building this tutor. No dangling states, no missing terminators.</p>`
-  },
-  {
-    sev:'ok', sevLabel:'By design',
-    title:'No separate handling needed for conjuncts (ಒತ್ತಕ್ಷರ)',
-    body:`<p>The layout never explicitly builds consonant clusters (e.g. ಸ್ಕ, ರ್ಥ) — and it doesn't need to. Because Kannada Unicode represents conjuncts as a plain consonant + virama + consonant sequence, simply typing the two consonants back-to-back with a virama between them produces the correct underlying text; the visual ligature is formed by the system's text-shaping engine, not the keyboard layout. This is correct and expected behaviour, not a gap.</p>`
-  },
-  {
-    sev:'warn', sevLabel:'Coverage gap',
-    title:'No way to type Western Arabic digits (0–9) directly',
-    body:`<p>The base number row types Kannada numerals (೦–೯) and the Shift row types symbols (!@#…). There's no layer on the primary US-ANSI keys that produces plain "0123456789" — needed constantly in real writing (dates, phone numbers, prices, code, addresses). The Command-layer (⌘) does map to plain Latin QWERTY including digits, so it's reachable, but it's not obvious/discoverable, and worth calling out explicitly in the layout's own documentation.</p>`
-  },
-  {
-    sev:'ok', sevLabel:'Nice touch',
-    title:'A full Latin/QWERTY fallback layer exists (⌘ and ⌥ modifiers)',
-    body:`<p>Holding <code>Command</code> (or <code>Option</code>) types plain ASCII QWERTY regardless of the Kannada layer being active — useful for switching to English mid-sentence, filenames, URLs, or keyboard shortcuts without switching input sources. This is a thoughtful inclusion many phonetic layouts skip.</p>`
-  },
-  {
-    sev:'ok', sevLabel:'Scope note',
-    title:'ISO/JIS extra-key overrides (keyMapSet "16c") are out of scope for this tutor',
-    body:`<p>The layout defines a secondary key-map set for a handful of hardware-specific keys (section-sign key, extra ISO key, etc.) that only exist on non-US keyboard hardware. This web tutor targets the standard US ANSI layout, so those overrides aren't rendered here — they don't need review changes, just noting for completeness.</p>`
-  }
-];
-
 const reviewListEl = document.getElementById('reviewList');
-FINDINGS.forEach(f=>{
-  const div = document.createElement('div');
-  div.className = 'finding ' + f.sev;
-  div.innerHTML = `<h3><span class="sev">${f.sevLabel}</span>${f.title}</h3>${f.body}`;
-  reviewListEl.appendChild(div);
-});
+function renderReview(){
+  reviewListEl.innerHTML = '';
+  (LAYOUT.findings || []).forEach(f=>{
+    const div = document.createElement('div');
+    div.className = 'finding ' + f.sev;
+    div.innerHTML = `<h3><span class="sev">${escapeHtml(f.sevLabel)}</span>${escapeHtml(f.title)}</h3>${f.body}`;
+    reviewListEl.appendChild(div);
+  });
+}
+
+/* ============================================================
+   Boot
+   ============================================================ */
+buildPicker();
+syncLayoutUI();
+const digitToggleEl = document.getElementById('digitToggle');
+if(digitToggleEl){
+  digitToggleEl.classList.toggle('on', westDigits);
+  digitToggleEl.setAttribute('aria-checked', westDigits ? 'true' : 'false');
+  digitToggleEl.addEventListener('click', ()=> setWestDigits(!westDigits));
+}
 
 })();

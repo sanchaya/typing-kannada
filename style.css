@@ -33,9 +33,9 @@ body{
   background:var(--primary-grad);
 }
 .wrap{max-width:1080px;margin:0 auto;padding:0 24px 80px;}
-header.hero{padding:48px 0 30px;}
+header.hero{padding:32px 0 24px;}
 
-.brand{display:inline-block;margin-bottom:22px;}
+.brand{display:inline-block;margin-bottom:12px;}
 .brand-logo{height:52px;width:auto;display:block;}
 
 .eyebrow{
@@ -45,7 +45,7 @@ header.hero{padding:48px 0 30px;}
   text-transform:uppercase;
   color:var(--primary-2);
   display:flex;align-items:center;gap:10px;
-  margin-bottom:16px;
+  margin-bottom:10px;
 }
 .eyebrow::before{content:'';width:22px;height:1px;background:var(--primary);display:inline-block;}
 h1.title{
@@ -53,7 +53,7 @@ h1.title{
   font-weight:700;
   font-size:54px;
   line-height:1.05;
-  margin:0 0 14px;
+  margin:0 0 8px;
   color:var(--ink);
 }
 h1.title .accent{color:var(--primary);}
@@ -64,14 +64,55 @@ p.tagline{
   font-size:20px;
   color:var(--ink-soft);
   max-width:640px;
-  margin:0 0 6px;
+  margin:14px 0 4px;
 }
 p.subtagline{
   font-size:15px;
   color:var(--ink-soft);
-  max-width:640px;
+  max-width:760px;
   margin:0;
 }
+
+.hero-row{display:flex;align-items:flex-start;justify-content:space-between;gap:32px;}
+
+.layout-picker{
+  flex:0 0 auto;width:284px;
+  display:flex;align-items:flex-start;flex-direction:column;gap:8px;
+  margin:4px 0 0;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:14px 18px;
+  box-shadow:var(--shadow);
+}
+.layout-picker label{
+  font-family:'Noto Sans Kannada','Inter',sans-serif;
+  font-size:13px;font-weight:600;color:var(--ink-soft);
+}
+.layout-picker select{
+  width:100%;
+  font-family:'Noto Sans Kannada','Inter',sans-serif;
+  font-size:14px;font-weight:600;color:var(--primary);
+  padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;
+  background:var(--bg);cursor:pointer;
+}
+.layout-picker select:hover{border-color:var(--primary);}
+.layout-desc{font-size:12.5px;line-height:1.5;color:var(--ink-soft);margin:0;}
+.layout-desc b{color:var(--primary);}
+
+.digit-toggle{
+  font-family:'Noto Sans Kannada','Inter',sans-serif;
+  font-size:12.5px;font-weight:600;color:var(--ink-soft);
+  border:1.5px solid var(--line);border-radius:8px;
+  background:var(--bg);cursor:pointer;padding:6px 10px;
+}
+.digit-toggle b{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:12.5px;}
+.digit-toggle .dg-kan{color:var(--ink-soft);}
+.digit-toggle .dg-lat{display:none;color:var(--primary);}
+.digit-toggle:hover{border-color:var(--primary);}
+.digit-toggle.on{border-color:var(--primary);}
+.digit-toggle.on .dg-kan{display:none;}
+.digit-toggle.on .dg-lat{display:inline;}
 
 nav.tabs{
   display:flex;
@@ -348,6 +389,7 @@ h2.section-title{
   border-radius:5px;padding:3px 7px;color:var(--ink);
 }
 .cx-key.shift::before{content:'⇧ ';color:var(--primary);}
+.cx-key.alt::before{content:'⌥ ';color:var(--primary);}
 .cx-codepoints{
   display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;padding-top:10px;border-top:1px dashed var(--line);
 }
@@ -428,9 +470,12 @@ h2.section-title{
 .future-note p{margin:0;font-size:13.5px;color:var(--ink-soft);line-height:1.6;}
 
 footer{text-align:center;padding:30px 0 10px;font-size:12px;color:var(--span);font-family:'JetBrains Mono',monospace;}
+footer a{color:var(--primary);text-decoration:underline;}
 
 @media (max-width:640px){
   h1.title{font-size:38px;}
+  .hero-row{flex-direction:column;}
+  .layout-picker{width:100%;}
   .target-word{font-size:30px;}
   .key{height:44px;min-width:30px;}
   .key .main{font-size:15px;}

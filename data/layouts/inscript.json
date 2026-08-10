@@ -1,0 +1,470 @@
+{
+ "id": "kn-inscript",
+ "name": "ಇನ್‌ಸ್ಕ್ರಿಪ್ಟ್",
+ "description": "Inscript keyboard for Kannada script",
+ "patterns": [
+  [
+   "x",
+   "ಂ"
+  ],
+  [
+   "_",
+   "ಃ"
+  ],
+  [
+   "D",
+   "ಅ"
+  ],
+  [
+   "E",
+   "ಆ"
+  ],
+  [
+   "F",
+   "ಇ"
+  ],
+  [
+   "R",
+   "ಈ"
+  ],
+  [
+   "G",
+   "ಉ"
+  ],
+  [
+   "T",
+   "ಊ"
+  ],
+  [
+   "\\+",
+   "ಋ"
+  ],
+  [
+   "Z",
+   "ಎ"
+  ],
+  [
+   "S",
+   "ಏ"
+  ],
+  [
+   "W",
+   "ಐ"
+  ],
+  [
+   "~",
+   "ಒ"
+  ],
+  [
+   "A",
+   "ಓ"
+  ],
+  [
+   "Q",
+   "ಔ"
+  ],
+  [
+   "k",
+   "ಕ"
+  ],
+  [
+   "K",
+   "ಖ"
+  ],
+  [
+   "i",
+   "ಗ"
+  ],
+  [
+   "I",
+   "ಘ"
+  ],
+  [
+   "U",
+   "ಙ"
+  ],
+  [
+   ";",
+   "ಚ"
+  ],
+  [
+   "\\:",
+   "ಛ"
+  ],
+  [
+   "p",
+   "ಜ"
+  ],
+  [
+   "P",
+   "ಝ"
+  ],
+  [
+   "\\}",
+   "ಞ"
+  ],
+  [
+   "'",
+   "",
+   "ಟ"
+  ],
+  [
+   "\"",
+   "ಠ"
+  ],
+  [
+   "\\[",
+   "ಡ"
+  ],
+  [
+   "\\{",
+   "ಢ"
+  ],
+  [
+   "C",
+   "ಣ"
+  ],
+  [
+   "l",
+   "ತ"
+  ],
+  [
+   "L",
+   "ಥ"
+  ],
+  [
+   "o",
+   "ದ"
+  ],
+  [
+   "O",
+   "ಧ"
+  ],
+  [
+   "v",
+   "ನ"
+  ],
+  [
+   "h",
+   "ಪ"
+  ],
+  [
+   "H",
+   "ಫ"
+  ],
+  [
+   "y",
+   "ಬ"
+  ],
+  [
+   "Y",
+   "ಭ"
+  ],
+  [
+   "c",
+   "ಮ"
+  ],
+  [
+   "/",
+   "ಯ"
+  ],
+  [
+   "j",
+   "ರ"
+  ],
+  [
+   "J",
+   "ಱ"
+  ],
+  [
+   "n",
+   "ಲ"
+  ],
+  [
+   "N",
+   "ಳ"
+  ],
+  [
+   "b",
+   "ವ"
+  ],
+  [
+   "M",
+   "ಶ"
+  ],
+  [
+   ",",
+   "ಷ"
+  ],
+  [
+   "m",
+   "ಸ"
+  ],
+  [
+   "u",
+   "ಹ"
+  ],
+  [
+   "\\]",
+   "಼"
+  ],
+  [
+   "e",
+   "ಾ"
+  ],
+  [
+   "f",
+   "ಿ"
+  ],
+  [
+   "r",
+   "ೀ"
+  ],
+  [
+   "g",
+   "ು"
+  ],
+  [
+   "t",
+   "ೂ"
+  ],
+  [
+   "\\=",
+   "ೃ"
+  ],
+  [
+   "z",
+   "ೆ"
+  ],
+  [
+   "s",
+   "ೇ"
+  ],
+  [
+   "w",
+   "ೈ"
+  ],
+  [
+   "`",
+   "ೊ"
+  ],
+  [
+   "a",
+   "ೋ"
+  ],
+  [
+   "q",
+   "ೌ"
+  ],
+  [
+   "d",
+   "್"
+  ],
+  [
+   "t",
+   "ೂ"
+  ],
+  [
+   "0",
+   "೦"
+  ],
+  [
+   "1",
+   "೧"
+  ],
+  [
+   "2",
+   "೨"
+  ],
+  [
+   "3",
+   "೩"
+  ],
+  [
+   "4",
+   "೪"
+  ],
+  [
+   "5",
+   "೫"
+  ],
+  [
+   "6",
+   "೬"
+  ],
+  [
+   "7",
+   "೭"
+  ],
+  [
+   "8",
+   "೮"
+  ],
+  [
+   "9",
+   "೯"
+  ],
+  [
+   "\\#",
+   "್ರ"
+  ],
+  [
+   "\\%",
+   "ಜ್ಞ"
+  ],
+  [
+   "\\^",
+   "ತ್ರ"
+  ],
+  [
+   "\\&",
+   "ಕ್ರ"
+  ],
+  [
+   "\\(",
+   "‍"
+  ],
+  [
+   "\\)",
+   "‌"
+  ]
+ ],
+ "patterns_x": [
+  [
+   "F",
+   "ಌ"
+  ],
+  [
+   "\\>",
+   "ಽ"
+  ],
+  [
+   "\\=",
+   "ೄ"
+  ],
+  [
+   "H",
+   "ೞ"
+  ],
+  [
+   "\\+",
+   "ೠ"
+  ],
+  [
+   "R",
+   "ೡ"
+  ],
+  [
+   "f",
+   "ೢ"
+  ],
+  [
+   "r",
+   "ೣ"
+  ],
+  [
+   "\\>",
+   "೤"
+  ],
+  [
+   "\\.",
+   "೥"
+  ],
+  [
+   "u",
+   "ೱ"
+  ],
+  [
+   "j",
+   "ೲ"
+  ],
+  [
+   "\\$",
+   "₹"
+  ]
+ ],
+ "patterns_shift": [],
+ "maxKeyLength": 1,
+ "contextLength": 0,
+ "examples": [
+  {
+   "tag": "Positional mapping",
+   "word": "ಕ",
+   "gloss": "ka — InScript puts ಕ on the physical K key (K→ಕ)",
+   "built": "InScript is positional: every key maps to a fixed letter. ಕ sits on K; its aspirate ಖ on shift+K.",
+   "keys": [
+    "k"
+   ]
+  },
+  {
+   "tag": "Vowel sign",
+   "word": "ಕಾ",
+   "gloss": "kā — the ā-sign (಼a) is on E",
+   "built": "Consonant vowel-signs have their own keys: typing e after a consonant adds ಾ, so k + e = ಕಾ.",
+   "keys": [
+    "k",
+    "e"
+   ]
+  },
+  {
+   "tag": "Vowel sign",
+   "word": "ಕಿ",
+   "gloss": "ki — short i is on F",
+   "built": "k + f = ಕಿ; like ā, the short-i sign is a dedicated InScript key, not a combination.",
+   "keys": [
+    "k",
+    "f"
+   ]
+  },
+  {
+   "tag": "Conjunct shortcut",
+   "word": "ಕ್ರ",
+   "gloss": "kra — & is a dedicated conjunct key",
+   "built": "InScript bakes the most common conjuncts into single keys (& = ಕ್ರ). Same idea as KGP's action keys.",
+   "keys": [
+    "&"
+   ]
+  },
+  {
+   "tag": "Conjunct by spelling",
+   "word": "ಕ್ಷ",
+   "gloss": "kSa — virama on d, then ಷ on ,",
+   "built": "Type the virama key (d) between two consonants to build any conjunct: k + d + , = ಕ್ಷ. This is the general InScript way.",
+   "keys": [
+    "k",
+    "d",
+    ","
+   ]
+  },
+  {
+   "tag": "Historic letter",
+   "word": "ಱ",
+   "gloss": "rra — survives on shift+J",
+   "built": "ಱ (the old rra) is preserved on J in the InScript keymap, alongside modern ಙ/E, ನ, ಳ etc.",
+   "keys": [
+    "J"
+   ]
+  }
+ ],
+ "findings": [
+  {
+   "sev": "info",
+   "sevLabel": "Layout family",
+   "title": "InScript (IS 16394) — the government-standard positional layout",
+   "body": "<p>Every key maps to one fixed Kannada letter, so the mapping is positional rather than phonetic — it matches the InScript wiring in Windows/Linux and the Wikimedia jQuery.IME <code>kn-inscript</code> rule set this data was generated from.</p><p><b>Data fix applied:</b> the upstream alternate-layer entry for key <code>F</code> was a malformed escape (<code>\\uC88C</code>, which renders as a Hangul syllable); corrected to <code>ಌ</code> (U+0C8C VOCALIC L), matching the enhanced variant and the ISCII historic set.</p>"
+  },
+  {
+   "sev": "ok",
+   "sevLabel": "Historic layer",
+   "title": "Historic and rare letters live on the Alternate (⌥/AltGr) layer",
+   "body": "<p>ಌ ಽ ೄ ೞ ೠ ೡ ೢ ೣ ೱ ೲ (and ₹) are reachable by holding ⌥ (Alt) plus the shown key — the reference strip below the keyboard maps each one. ಱ is actually on the base layer at shift+J.</p>"
+  },
+  {
+   "sev": "ok",
+   "sevLabel": "Coverage note",
+   "title": "Vowel signs and conjuncts are keyed, not computed",
+   "body": "<p>Each vowel sign (ಿ ೀ ು ೂ ೆ ೇ ೈ ೊ ೋ ೌ) has its own physical key, and the common conjuncts (ಕ್ರ ಜ್ಞ ತ್ರ) are dedicated keys; any other conjunct is spelled via the virama key <code>d</code> (consonant + d + consonant).</p>"
+  }
+ ],
+ "type": "ime"
+}

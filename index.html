@@ -23,10 +23,19 @@
   <a class="brand" href="#" aria-label="ಕೀಲಿಕನ್ನಡ — home">
     <img src="img/app-icon-light.png" alt="ಕೀಲಿಕನ್ನಡ logo" class="brand-logo">
   </a>
-  <div class="eyebrow">ಕೀಲಿಕನ್ನಡ · a Sanchaya typing tutor · KPRao / KGP / Nudi keyboard</div>
-  <h1 class="title">ಟೈಪಿಂಗ್ ಕಲಿಯಿರಿ <span class="accent">ಕನ್ನಡ</span></h1>
+  <div class="eyebrow">ಕೀಲಿಕನ್ನಡ · a Sanchaya typing tutor · 4 Kannada layouts</div>
+
+  <div class="hero-row">
+    <h1 class="title">ಟೈಪಿಂಗ್ ಕಲಿಯಿರಿ <span class="accent">ಕನ್ನಡ</span></h1>
+    <div class="layout-picker">
+      <label for="layoutSelect">ಕೀಲಿ ವಿನ್ಯಾಸ · Layout:</label>
+      <select id="layoutSelect" aria-label="Choose a keyboard layout"></select>
+      <p class="layout-desc" id="layoutDesc"></p>
+    </div>
+  </div>
+
   <p class="tagline">"ಅಕ್ಷರಶಃ" ಕಲಿಯಿರಿ — learn to type Kannada, one akshara at a time.</p>
-  <p class="subtagline">An interactive keyboard tutor built on the KPRao/KGP/Nudi macOS keyboard layout. Practise on your own physical keyboard, watch the virtual board light up, and build real typing speed.</p>
+  <p class="subtagline">An interactive keyboard tutor with the key you choose from the picker — the KPRao/KGP/Nudi keymap, the government-standard InScript positionals, or a phonetic transliteration. Practise on your own physical keyboard, watch the virtual board light up, and build real typing speed.</p>
 </header>
 
 <nav class="tabs">
@@ -44,6 +53,7 @@
     <p class="section-sub">Hover or click a key to preview it, or just start typing on your physical keyboard — the board below mirrors it live.</p>
     <div class="kbd-controls">
       <button class="toggle-btn" id="shiftToggle">⇧ Shift layer</button>
+      <button class="digit-toggle" id="digitToggle" role="switch" aria-checked="false" title="Switch digit keys between the layout's Kannada digits (೦-೯) and Western digits (0-9)">ಅಂಕಿಗಳು <b class="dg-kan">೦-೯</b><b class="dg-lat">0-9</b></button>
       <span class="legend-note">Top-right of each key = <b>Shift</b> layer. Main glyph = base layer.</span>
     </div>
     <div class="keyboard" id="kbLayout"></div>
@@ -110,7 +120,7 @@
     <div id="complexGrid" class="complex-grid"></div>
 
     <h3 class="section-subtitle">ಪೂರ್ಣ ಯುನಿಕೋಡ್ ವ್ಯಾಪ್ತಿ — Full Unicode block coverage</h3>
-    <p class="section-sub">Every assigned codepoint in the Kannada block (U+0C80–U+0CFF). Green-bordered tiles are reachable on this keyboard; the rest are historic letters and rare signs that have no physical key on the KPRao/KGP/Nudi layout — shown here as a font-rendering reference. If a tile shows a placeholder box, your font lacks that glyph.</p>
+    <p class="section-sub">Every assigned codepoint in the Kannada block (U+0C80–U+0CFF). Green-bordered tiles are on the selected layout's keys; the rest are historic letters and rare signs typed via a modifier (or composed by typing) — shown here as a font-rendering reference. If a tile shows a placeholder box, your font lacks that glyph.</p>
     <div id="unicodeGrid" class="unicode-grid"></div>
   </div>
 </section>
@@ -119,14 +129,14 @@
 <section class="panel" id="panel-review">
   <div class="card">
     <h2 class="section-title">ಪರಿಶೀಲನೆ — Keyboard Review Notes</h2>
-    <p class="section-sub">Findings from auditing <code>KPRao-KGP-Nudi.keylayout</code> before this goes near a public release or an installer. Ordered roughly by severity.</p>
+    <p class="section-sub">Findings from auditing the selected layout's data (the keymap/state-machine and rule configs) before this goes near a public release. Ordered roughly by severity.</p>
     <div id="reviewList"></div>
   </div>
 </section>
 
 </div>
 
-<footer>ಕೀಲಿಕನ್ನಡ · ಕನ್ನಡ ಅಕ್ಷರಶಃ ಟೈಪಿಂಗ್ tutor · practise well, ಶುಭವಾಗಲಿ — © ಸಂಚಯ ಮತ್ತು ಸಂಚಿ ಫೌಂಡೇಶನ್</footer>
+<footer>ಕೀಲಿಕನ್ನಡ · ಕನ್ನಡ ಅಕ್ಷರಶಃ ಟೈಪಿಂಗ್ tutor · practise well, ಶುಭವಾಗಲಿ — © <a href="https://sanchaya.org" target="_blank" rel="noopener">ಸಂಚಯ</a> ಮತ್ತು <a href="https://sanchifoundation.org" target="_blank" rel="noopener">ಸಂಚಿ ಫೌಂಡೇಶನ್</a></footer>
 
 <script src="app.js" defer></script>
 </body>

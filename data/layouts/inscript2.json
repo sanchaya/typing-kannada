@@ -1,0 +1,498 @@
+{
+ "id": "kn-inscript2",
+ "name": "ಇನ್‌ಸ್ಕ್ರಿಪ್ಟ್ ೨",
+ "description": "Enhanced InScript keyboard for Kannada script",
+ "contextLength": 0,
+ "maxKeyLength": 1,
+ "patterns": [
+  [
+   "1",
+   "೧"
+  ],
+  [
+   "2",
+   "೨"
+  ],
+  [
+   "\\#",
+   "್ರ"
+  ],
+  [
+   "3",
+   "೩"
+  ],
+  [
+   "\\$",
+   "ರ್"
+  ],
+  [
+   "4",
+   "೪"
+  ],
+  [
+   "5",
+   "೫"
+  ],
+  [
+   "6",
+   "೬"
+  ],
+  [
+   "7",
+   "೭"
+  ],
+  [
+   "8",
+   "೮"
+  ],
+  [
+   "\\(",
+   "("
+  ],
+  [
+   "9",
+   "೯"
+  ],
+  [
+   "\\)",
+   ")"
+  ],
+  [
+   "0",
+   "೦"
+  ],
+  [
+   "\\_",
+   "ಃ"
+  ],
+  [
+   "\\-",
+   "-"
+  ],
+  [
+   "\\+",
+   "ಋ"
+  ],
+  [
+   "\\=",
+   "ೃ"
+  ],
+  [
+   "Q",
+   "ಔ"
+  ],
+  [
+   "q",
+   "ೌ"
+  ],
+  [
+   "W",
+   "ಐ"
+  ],
+  [
+   "w",
+   "ೈ"
+  ],
+  [
+   "E",
+   "ಆ"
+  ],
+  [
+   "e",
+   "ಾ"
+  ],
+  [
+   "R",
+   "ಈ"
+  ],
+  [
+   "r",
+   "ೀ"
+  ],
+  [
+   "T",
+   "ಊ"
+  ],
+  [
+   "t",
+   "ೂ"
+  ],
+  [
+   "Y",
+   "ಭ"
+  ],
+  [
+   "y",
+   "ಬ"
+  ],
+  [
+   "U",
+   "ಙ"
+  ],
+  [
+   "u",
+   "ಹ"
+  ],
+  [
+   "I",
+   "ಘ"
+  ],
+  [
+   "i",
+   "ಗ"
+  ],
+  [
+   "O",
+   "ಧ"
+  ],
+  [
+   "o",
+   "ದ"
+  ],
+  [
+   "P",
+   "ಝ"
+  ],
+  [
+   "p",
+   "ಜ"
+  ],
+  [
+   "\\{",
+   "ಢ"
+  ],
+  [
+   "\\[",
+   "ಡ"
+  ],
+  [
+   "\\}",
+   "ಞ"
+  ],
+  [
+   "\\]",
+   "಼"
+  ],
+  [
+   "A",
+   "ಓ"
+  ],
+  [
+   "a",
+   "ೋ"
+  ],
+  [
+   "S",
+   "ಏ"
+  ],
+  [
+   "s",
+   "ೇ"
+  ],
+  [
+   "D",
+   "ಅ"
+  ],
+  [
+   "d",
+   "್"
+  ],
+  [
+   "F",
+   "ಇ"
+  ],
+  [
+   "f",
+   "ಿ"
+  ],
+  [
+   "G",
+   "ಉ"
+  ],
+  [
+   "g",
+   "ು"
+  ],
+  [
+   "H",
+   "ಫ"
+  ],
+  [
+   "h",
+   "ಪ"
+  ],
+  [
+   "J",
+   "ಱ"
+  ],
+  [
+   "j",
+   "ರ"
+  ],
+  [
+   "K",
+   "ಖ"
+  ],
+  [
+   "k",
+   "ಕ"
+  ],
+  [
+   "L",
+   "ಥ"
+  ],
+  [
+   "l",
+   "ತ"
+  ],
+  [
+   ":",
+   "ಛ"
+  ],
+  [
+   ";",
+   "ಚ"
+  ],
+  [
+   "\"",
+   "ಠ"
+  ],
+  [
+   "\\'",
+   "ಟ"
+  ],
+  [
+   "\\~",
+   "ಒ"
+  ],
+  [
+   "`\\",
+   "ೊ"
+  ],
+  [
+   "Z",
+   "ಎ"
+  ],
+  [
+   "z",
+   "ೆ"
+  ],
+  [
+   "x",
+   "ಂ"
+  ],
+  [
+   "C",
+   "ಣ"
+  ],
+  [
+   "c",
+   "ಮ"
+  ],
+  [
+   "v",
+   "ನ"
+  ],
+  [
+   "b",
+   "ವ"
+  ],
+  [
+   "N",
+   "ಳ"
+  ],
+  [
+   "n",
+   "ಲ"
+  ],
+  [
+   "M",
+   "ಶ"
+  ],
+  [
+   "m",
+   "ಸ"
+  ],
+  [
+   "\\<",
+   "ಷ"
+  ],
+  [
+   ",",
+   ","
+  ],
+  [
+   "\\>",
+   "।"
+  ],
+  [
+   "\\.",
+   "."
+  ],
+  [
+   "/",
+   "ಯ"
+  ],
+  [
+   "\\%",
+   "ಜ್ಞ"
+  ],
+  [
+   "\\^",
+   "ತ್ರ"
+  ],
+  [
+   "\\&",
+   "ಕ್ಷ"
+  ],
+  [
+   "\\*",
+   "ಶ್ರ"
+  ]
+ ],
+ "patterns_x": [
+  [
+   "1",
+   "‍"
+  ],
+  [
+   "2",
+   "‌"
+  ],
+  [
+   "4",
+   "₹"
+  ],
+  [
+   "\\+",
+   "ೠ"
+  ],
+  [
+   "\\=",
+   "ೄ"
+  ],
+  [
+   "R",
+   "ೡ"
+  ],
+  [
+   "r",
+   "ೣ"
+  ],
+  [
+   "u",
+   "ೱ"
+  ],
+  [
+   "F",
+   "ಌ"
+  ],
+  [
+   "f",
+   "ೢ"
+  ],
+  [
+   "H",
+   "ೞ"
+  ],
+  [
+   "j",
+   "ೲ"
+  ],
+  [
+   "\\>",
+   "ಽ"
+  ],
+  [
+   "\\.",
+   "॥"
+  ]
+ ],
+ "patterns_shift": [],
+ "examples": [
+  {
+   "tag": "Positional mapping",
+   "word": "ಕ",
+   "gloss": "ka on K",
+   "built": "Enhanced InScript keeps the same positional base as plain InScript — ಕ on K.",
+   "keys": [
+    "k"
+   ]
+  },
+  {
+   "tag": "Conjunct shortcut",
+   "word": "ಕ್ಷ",
+   "gloss": "kSa — & types ಕ್ಷ directly",
+   "built": "Enhanced InScript adds the ಕ್ಷ ligature to the & key (plain InScript only gives ಕ್ರ there).",
+   "keys": [
+    "&"
+   ]
+  },
+  {
+   "tag": "Conjunct shortcut",
+   "word": "ಜ್ಞ",
+   "gloss": "jña — % types ಜ್ಞ",
+   "built": "% yields the famous jña ligature; * gives ಶ್ರ and # gives ರ. All the calligraphic conjuncts sit on the number row.",
+   "keys": [
+    "%"
+   ]
+  },
+  {
+   "tag": "Alt-layer conjunct",
+   "word": "ಶ್ರ",
+   "gloss": "śra — * on the base row",
+   "built": "* types ಶ್ರ in one key — most of InScript\troublesome ligatures are one keystroke here.",
+   "keys": [
+    "*"
+   ]
+  },
+  {
+   "tag": "ZWJ/ZWNJ",
+   "word": "‍",
+   "gloss": "zero-width joiner — ⌥ + 1",
+   "built": "ZWJ sits on the Alternate layer: hold ⌥ and press 1. After a consonant this gives a visible standalone halant (type it, then the next letter to join).",
+   "keys": [
+    {
+     "label": "1",
+     "alt": true
+    }
+   ]
+  },
+  {
+   "tag": "ZWJ/ZWNJ",
+   "word": "‌",
+   "gloss": "zero-width non-joiner — ⌥ + 2",
+   "built": "ZWNJ on ⌥+2 prevents ligation — the parallel of KGP's double-virama trick.",
+   "keys": [
+    {
+     "label": "2",
+     "alt": true
+    }
+   ]
+  },
+  {
+   "tag": "Historic letter",
+   "word": "ಱ",
+   "gloss": "rra on shift+J",
+   "built": "ಱ is preserved on J; the ⌥-layer holds ಌ ೞ ೠ ೡ ೱ ೲ and ₹.",
+   "keys": [
+    "J"
+   ]
+  }
+ ],
+ "findings": [
+  {
+   "sev": "info",
+   "sevLabel": "Layout family",
+   "title": "Enhanced InScript (kn-inscript2)",
+   "body": "<p>A refined InScript variant from the same Wikimedia jQuery.IME family. Differs from plain InScript mainly in edge keys: ZWJ on <code>1</code>, ZWNJ on <code>2</code>, ₹ on <code>4</code> (⌥), and extra conjunct keys (& ಕ್ಷ, * ಶ್ರ, # ರ, % ಜ್ಞ). Same positional base.</p>"
+  },
+  {
+   "sev": "ok",
+   "sevLabel": "Historic layer",
+   "title": "Historic set on the Alternate (⌥) layer",
+   "body": "<p>ಌ ೄ ೞ ೠ ೡ ೢ ೣ ೱ ೲ sit on ⌥-layer keys; ಱ on the base shift+J. The Unicode grid marks each reachable character and how to type it.</p>"
+  }
+ ],
+ "type": "ime"
+}

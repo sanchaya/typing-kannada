@@ -1,0 +1,40 @@
+{
+  "layouts": [
+    {
+      "id": "kgp",
+      "type": "keymap",
+      "name": "ಕೆಜಿಪಿ / ನುಡಿ",
+      "nameEn": "KGP · Nudi · KPRao phonetic",
+      "file": "data/layouts/kgp.json",
+      "tag": "kgp-1.0",
+      "description": "Phonetic layout (KPRao/KGP/Nudi family). Type by sound — k→ಕ, A→ಾ, f→್, M→ಂ."
+    },
+    {
+      "id": "inscript",
+      "type": "ime",
+      "name": "ಇನ್‌ಸ್ಕ್ರಿಪ್ಟ್",
+      "nameEn": "InScript (IS 16394)",
+      "file": "data/layouts/inscript.json",
+      "tag": "inscript-1.0",
+      "description": "Government-standard positional layout. Every key has a fixed letter; matches Windows/Linux Kannada InScript."
+    },
+    {
+      "id": "transliteration",
+      "type": "ime",
+      "name": "ಲಿಪ್ಯಂತರಣ",
+      "nameEn": "Transliteration (ITRANS-style)",
+      "file": "data/layouts/transliteration.json",
+      "tag": "transliteration-1.0",
+      "description": "Roman-to-Kannada: type k→ಕ, ka→ಕಾ, kSa→ಕ್ಷ, Sh→ಷ. No physical layout to memorise."
+    },
+    {
+      "id": "inscript2",
+      "type": "ime",
+      "name": "ಇನ್‌ಸ್ಕ್ರಿಪ್ಟ್ ೨",
+      "nameEn": "Enhanced InScript",
+      "file": "data/layouts/inscript2.json",
+      "tag": "inscript2-1.0",
+      "description": "Enhanced InScript variant with direct ZWJ/ZWNJ keys, ₹, and historic letters on the alternate layer."
+    }
+  ]
+}

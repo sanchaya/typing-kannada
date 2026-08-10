@@ -1,4 +1,30 @@
 {
+ "id": "kgp",
+ "type": "keymap",
+ "name": "ಕೆಜಿಪಿ / ನುಡಿ",
+ "nameEn": "KGP · Nudi · KPRao phonetic",
+ "tag": "kgp-1.0",
+ "description": "Phonetic layout (KPRao/KGP/Nudi family). Type by sound — k→ಕ, A→ಾ, f→್, M→ಂ.",
+ "historicPrefixCode": 50,
+ "historicPrefixChar": "`",
+ "historicSeq": {
+  "2": "಄",
+  "16": "ಁ",
+  "18": "ಌ",
+  "26": "ೢ",
+  "27": "ೣ",
+  "28": "ೕ",
+  "30": "ಱ",
+  "31": "ೠ",
+  "33": "ೖ",
+  "64": "ೲ",
+  "74": "ೞ",
+  "75": "ೡ",
+  "76": "ೱ",
+  "90": "ೝ",
+  "92": "ೳ",
+  "93": "ಀ"
+ },
  "keymap0": {
   "0": {
    "type": "action",
@@ -436,6 +462,26 @@
   }
  },
  "actions": {
+  "5": {
+   "none": {
+    "output": " "
+   },
+   "State 1": {
+    "output": "´"
+   },
+   "State 2": {
+    "output": "`"
+   },
+   "State 3": {
+    "output": "ˆ"
+   },
+   "State 4": {
+    "output": "¨"
+   },
+   "State 5": {
+    "output": "˜"
+   }
+  },
   "ಅ": {
    "none": {
     "next": "ಅ"
@@ -2277,26 +2323,6 @@
     "next": "ಹ"
    }
   },
-  "5": {
-   "none": {
-    "output": " "
-   },
-   "State 1": {
-    "output": "´"
-   },
-   "State 2": {
-    "output": "`"
-   },
-   "State 3": {
-    "output": "ˆ"
-   },
-   "State 4": {
-    "output": "¨"
-   },
-   "State 5": {
-    "output": "˜"
-   }
-  },
   "್": {
    "none": {
     "output": "್"
@@ -2611,5 +2637,285 @@
   "ಷ್": "ಷ್",
   "ಸ್": "ಸ್",
   "ಹ್": "ಹ್"
- }
+ },
+ "examples": [
+  {
+   "tag": "Traditional ligature",
+   "word": "ಕ್ಷಣ",
+   "gloss": "kṣaṇa — \"moment\"",
+   "built": "ಕ + ್ (virama) + ಷ + ಣ — ಕ+ಷ is one of two traditional conjuncts many fonts render as a single fused glyph rather than a visible stack.",
+   "keys": [
+    [
+     "K",
+     false
+    ],
+    [
+     "F",
+     false
+    ],
+    [
+     "X",
+     false
+    ],
+    [
+     "N",
+     true
+    ]
+   ]
+  },
+  {
+   "tag": "Traditional ligature",
+   "word": "ಜ್ಞಾನ",
+   "gloss": "jñāna — \"knowledge\"",
+   "built": "ಜ + ್ (virama) + ಞ + ಾ (long ā matra) + ನ — ಜ+ಞ is the other classic fused ligature (jña).",
+   "keys": [
+    [
+     "J",
+     false
+    ],
+    [
+     "F",
+     false
+    ],
+    [
+     "Z",
+     false
+    ],
+    [
+     "A",
+     true
+    ],
+    [
+     "N",
+     false
+    ]
+   ]
+  },
+  {
+   "tag": "Consonant cluster",
+   "word": "ಸ್ಪರ್ಧೆ",
+   "gloss": "spardhe — \"competition\"",
+   "built": "ಸ + ್ + ಪ, then ರ + ್ + ಧ + ೆ — two separate conjuncts back to back (ಸ್ಪ and ರ್ಧ).",
+   "keys": [
+    [
+     "S",
+     false
+    ],
+    [
+     "F",
+     false
+    ],
+    [
+     "P",
+     false
+    ],
+    [
+     "R",
+     false
+    ],
+    [
+     "F",
+     false
+    ],
+    [
+     "D",
+     true
+    ],
+    [
+     "E",
+     false
+    ]
+   ]
+  },
+  {
+   "tag": "Consonant cluster",
+   "word": "ಕ್ರಮ",
+   "gloss": "krama — \"method, order\"",
+   "built": "ಕ + ್ + ರ + ಮ — a consonant followed by ರ after virama often renders with a distinct \"ra-kar\" joined form rather than a plain stack.",
+   "keys": [
+    [
+     "K",
+     false
+    ],
+    [
+     "F",
+     false
+    ],
+    [
+     "R",
+     false
+    ],
+    [
+     "M",
+     false
+    ]
+   ]
+  },
+  {
+   "tag": "Reph-style cluster",
+   "word": "ಕರ್ನಾಟಕ",
+   "gloss": "Karnataka",
+   "built": "ಕ + ರ + ್ (virama, forms ರ್) + ನ + ಾ + ಟ + ಕ — the ರ್ that ends the syllable and starts the next is the everyday case that first surfaced the Shift+F bug.",
+   "keys": [
+    [
+     "K",
+     false
+    ],
+    [
+     "R",
+     false
+    ],
+    [
+     "F",
+     false
+    ],
+    [
+     "N",
+     false
+    ],
+    [
+     "A",
+     true
+    ],
+    [
+     "Q",
+     false
+    ],
+    [
+     "K",
+     false
+    ]
+   ]
+  },
+  {
+   "tag": "Vocalic matra",
+   "word": "ಕೃಷಿ",
+   "gloss": "kṛṣi — \"agriculture\"",
+   "built": "ಕ + ೃ (vocalic-r matra, Shift+R) + ಷ + ಿ (short i matra) — the ಋ-family vowel signs use their own dedicated pending state.",
+   "keys": [
+    [
+     "K",
+     false
+    ],
+    [
+     "R",
+     true
+    ],
+    [
+     "X",
+     false
+    ],
+    [
+     "I",
+     false
+    ]
+   ]
+  },
+  {
+   "tag": "Nukta form",
+   "word": "ಕ಼",
+   "gloss": "ka + nukta (not a standalone word — a technical demo)",
+   "built": "ಕ + ವಿಶೇಷ (Shift+X, the nukta/special-mark key) — used for sounds borrowed from other languages/scripts that plain Kannada consonants don't cover.",
+   "keys": [
+    [
+     "K",
+     false
+    ],
+    [
+     "X",
+     true
+    ]
+   ]
+  },
+  {
+   "tag": "Explicit virama · fixed",
+   "word": "ಕಾರ್‌",
+   "gloss": "\"car\", forced to stand alone (won't ligate with whatever follows)",
+   "built": "ಕ + ಾ + ರ + ್ + ್ (virama pressed twice) — this is the exact pattern that used to produce a stray duplicated virama; it's now a clean, generalized \"don't ligate this consonant\" instruction that works the same way on all 34 consonants, not just ಕ.",
+   "keys": [
+    [
+     "K",
+     false
+    ],
+    [
+     "A",
+     true
+    ],
+    [
+     "R",
+     false
+    ],
+    [
+     "F",
+     false
+    ],
+    [
+     "F",
+     false
+    ]
+   ]
+  }
+ ],
+ "findings": [
+  {
+   "sev": "ok",
+   "sevLabel": "Fixed · was critical",
+   "title": "ZWJ/ZWNJ garbage bug — reported live, now fixed",
+   "body": "<p>Real-world repro: typing <code>ಕಾರ್ನಲ್ಲಿ</code> using <code>R</code> → <code>F</code> (virama) → <code>Shift+F</code> produced <code>ಕಾರ್‌್ನಲ್ಲಿ</code> — a duplicated virama with a stray ZWNJ wedged in between. Root cause was two of the findings below combining: Shift+F was a blind literal key that always stapled on ZWNJ+virama regardless of context, and the \"type virama twice to force a standalone consonant\" feature only existed for ಕ, so every other consonant fell through to broken behaviour.</p><p><b>Fix applied:</b> Shift+F is no longer a separate literal-output key — it now routes through the exact same context-aware virama action as the base key. The \"double-virama forces an explicit, non-ligating consonant + ZWNJ\" behaviour is generalized from just ಕ to all 34 consonants (33 new state transitions + 33 new terminators, verified programmatically). Re-running the original repro sequence now produces a clean, meaningful result — an intentionally standalone ರ್ — instead of garbage. Regular typing (single virama presses, ordinary conjuncts) is unaffected; see the Complex Characters tab for a live before/after.</p><p>Note: this fix lives in this web tutor's copy of the layout data. The upstream <code>.keylayout</code> source still has the original blind Shift+F mapping and the ಕ-only special case — apply the same generalization there if you want the real installed keyboard to match.</p>"
+  },
+  {
+   "sev": "critical",
+   "sevLabel": "Fix before shipping",
+   "title": "Two malformed XML entity references break the layout file",
+   "body": "<p>Two <code>output</code> attributes reference an undefined entity <code>&amp;x200c;</code> / <code>&amp;x200D;</code> — missing the <code>#</code> that makes it a numeric character reference. As written, this is not valid XML: a strict parser (and some build/import tools) will reject the file outright rather than silently treating it as the intended zero-width joiner / non-joiner.</p><pre>Line ~367:  &lt;key code=\"3\" output=\"&amp;x200c;\"/&gt;                (Caps layer, F key)\nLine ~1673: &lt;when state=\"none\" output=\"&amp;x200D;\"/&gt;   (nukta/ವಿಶೇಷ action)</pre><p>Fix: change both to proper numeric character references — <code>&amp;#x200c;</code> (ZWNJ) and <code>&amp;#x200D;</code> (ZWJ). This tutor's engine patches both automatically so the demo above behaves correctly, but the source <code>.keylayout</code> file itself still needs the correction before it's recompiled into an installer.</p>"
+  },
+  {
+   "sev": "warn",
+   "sevLabel": "Dead code",
+   "title": "Shift+Space is wired to an unreachable dead-key state machine",
+   "body": "<p>The <code>Shift+Space</code> key (Caps-layer index 1, code 49) is mapped to an action (\"5\") with five branches for <code>State 1</code> through <code>State 5</code>, intended to type spacing accent marks (´ ` ˆ ¨ ˜). But nothing anywhere in the file ever transitions the state machine into <code>State 1</code>–<code>State 5</code> — no key's <code>next</code> ever produces those names. The branches can never fire.</p><p>In practice, <code>Shift+Space</code> today just always outputs a plain space — the dead branches are inert, but they're also confusing for anyone maintaining the layout later, and they hint at an unfinished feature (a dead-key row for diacritics) that never got wired up.</p><p>Recommendation: either remove the unused branches and simplify <code>Shift+Space</code> to a plain output key, or finish the intended feature by adding the missing state transitions.</p>"
+  },
+  {
+   "sev": "ok",
+   "sevLabel": "Fixed · was \"inconsistency\"",
+   "title": "The \"F\" key (virama/nukta slot) used to behave differently on Shift vs Caps Lock",
+   "body": "<p>Originally, physical key <code>F</code> (code 3) carried three different behaviours across layers that were meant to mirror each other — base gave a context-aware virama, Shift blindly stapled on ZWNJ+virama, Caps Lock gave ZWNJ alone. Folded into the fix above: Shift+F now calls the same action as the base key, so all three layers are consistent (Caps Lock still needs the same treatment applied to its own key entry if you want full parity — it currently still uses the old literal-output style).</p>"
+  },
+  {
+   "sev": "ok",
+   "sevLabel": "Fixed · was \"incomplete feature\"",
+   "title": "Explicit \"visible virama\" (double-halant → ZWNJ) now works on all 34 consonants, not just ಕ",
+   "body": "<p>Typing a consonant then the virama key twice now forces that consonant to render standalone (with a ZWNJ) instead of ligating into a conjunct with whatever follows — generalized from the original ಕ-only special case. See the Complex Characters tab for a worked example on ರ.</p>"
+  },
+  {
+   "sev": "ok",
+   "sevLabel": "Verified sound",
+   "title": "Vowel-sign combination logic is complete and internally consistent",
+   "body": "<p>Every independent vowel action (ಆ ಇ ಈ ಉ ಊ ಋ ಎ ಏ ಐ ಒ ಓ ಔ) defines a branch for all 34 consonant states, and every state that a key transitions into via <code>next</code> has a matching <code>&lt;terminators&gt;</code> entry — verified programmatically across all 84 actions / 70 terminator states while building this tutor. No dangling states, no missing terminators.</p>"
+  },
+  {
+   "sev": "ok",
+   "sevLabel": "By design",
+   "title": "No separate handling needed for conjuncts (ಒತ್ತಕ್ಷರ)",
+   "body": "<p>The layout never explicitly builds consonant clusters (e.g. ಸ್ಕ, ರ್ಥ) — and it doesn't need to. Because Kannada Unicode represents conjuncts as a plain consonant + virama + consonant sequence, simply typing the two consonants back-to-back with a virama between them produces the correct underlying text; the visual ligature is formed by the system's text-shaping engine, not the keyboard layout. This is correct and expected behaviour, not a gap.</p>"
+  },
+  {
+   "sev": "warn",
+   "sevLabel": "Coverage gap",
+   "title": "No way to type Western Arabic digits (0–9) directly",
+   "body": "<p>The base number row types Kannada numerals (೦–೯) and the Shift row types symbols (!@#…). There's no layer on the primary US-ANSI keys that produces plain \"0123456789\" — needed constantly in real writing (dates, phone numbers, prices, code, addresses). The Command-layer (⌘) does map to plain Latin QWERTY including digits, so it's reachable, but it's not obvious/discoverable, and worth calling out explicitly in the layout's own documentation.</p>"
+  },
+  {
+   "sev": "ok",
+   "sevLabel": "Nice touch",
+   "title": "A full Latin/QWERTY fallback layer exists (⌘ and ⌥ modifiers)",
+   "body": "<p>Holding <code>Command</code> (or <code>Option</code>) types plain ASCII QWERTY regardless of the Kannada layer being active — useful for switching to English mid-sentence, filenames, URLs, or keyboard shortcuts without switching input sources. This is a thoughtful inclusion many phonetic layouts skip.</p>"
+  },
+  {
+   "sev": "ok",
+   "sevLabel": "Scope note",
+   "title": "ISO/JIS extra-key overrides (keyMapSet \"16c\") are out of scope for this tutor",
+   "body": "<p>The layout defines a secondary key-map set for a handful of hardware-specific keys (section-sign key, extra ISO key, etc.) that only exist on non-US keyboard hardware. This web tutor targets the standard US ANSI layout, so those overrides aren't rendered here — they don't need review changes, just noting for completeness.</p>"
+  }
+ ]
 }
