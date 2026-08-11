@@ -1056,7 +1056,7 @@ function advance(){
     curItem++;
     showItem();
   } else {
-    targetWordEl.innerHTML = `<span class="correct">✓ ${level.label} ಮುಗಿಯಿತು!</span>`;
+    targetWordEl.innerHTML = `<span class="correct">✓ ${level.label} ಮುಗಿದವು!</span>`;
     targetTranslitEl.textContent = 'Level complete — pick the next level above.';
     levelProgress.style.width = '100%';
   }
