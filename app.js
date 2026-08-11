@@ -74,7 +74,7 @@ const QWERTY_LABEL = {
   18:'1',19:'2',20:'3',21:'4',23:'5',22:'6',26:'7',28:'8',25:'9',29:'0',27:'-',24:'=',
   12:'Q',13:'W',14:'E',15:'R',17:'T',16:'Y',32:'U',34:'I',31:'O',35:'P',33:'[',30:']',42:'\\',
   0:'A',1:'S',2:'D',3:'F',5:'G',4:'H',38:'J',40:'K',37:'L',41:';',39:"'",
-  6:'Z',7:'X',8:'C',9:'V',11:'B',45:'N',46:'M',43:',',47:'.',44:'/'
+  6:'Z',7:'X',8:'C',9:'V',11:'B',45:'N',46:'M',43:',',47:'.',44:'/',50:'`'
 };
 /* what shift produces on each US-ANSI code -> the actual character an IME
    would receive (so we don't depend on OS key composition) */
@@ -595,6 +595,9 @@ function syncLayoutUI(){
     layoutSurface.setEngine();
     practiceSurface.setEngine();
     freeSurface.setEngine();
+    HINT_CACHE.clear();
+    imePrefixSet = null;
+    if(practiceActive) renderHint(LEVELS[curLevel].items[curItem]);
     resetShiftToggle();
     renderComplex();
     renderUnicode();
@@ -749,6 +752,7 @@ const LEVELS = [
 
 let curLevel = 0;
 let curItem = 0;
+let practiceActive = false;
 let sessionStart = null;
 let totalTypedChars = 0;
 let correctChars = 0;
@@ -780,8 +784,204 @@ const practiceSurface = attachTypingSurface(document.getElementById('surfacePrac
   onChange: onPracticeChange
 });
 
+/* ---------------- Layout-aware practice hints ----------------
+   Suggest which physical keys produce the target akshara(s) on the CURRENT
+   layout. Found by replaying the layout's own engine over a small bounded
+   search, so a suggested stroke always really types the target. Cached per
+   layout so switching layouts is instant. */
+const HINT_KEYS = (() => {
+  const list = [];
+  for(const code of Object.values(CODE_MAP)){
+    if(code === 48 || code === 51) continue; /* tab, backspace */
+    list.push({code, shift:false});
+    if(code !== 36 && code !== 49) list.push({code, shift:true}); /* enter, space */
+  }
+  return list;
+})();
+const HINT_CACHE = new Map();
+const graphemeSplit = (() => {
+  if(typeof Intl !== 'undefined' && Intl.Segmenter){
+    try{
+      const seg = new Intl.Segmenter('kn', {granularity:'grapheme'});
+      return s => Array.from(seg.segment(s), x => x.segment);
+    }catch(e){ /* fall through */ }
+  }
+  return s => [s];
+})();
+
+function hintKeyLabel(code, shift){
+  if(code === 49) return '␣';
+  if(LAYOUT.type === 'ime') return charFromCode(code, shift) || '?';
+  const base = QWERTY_LABEL[code] || '';
+  return shift ? '⇧+' + base.toUpperCase() : base;
+}
+
+function hintSimulate(seq){
+  const eng = createEngine();
+  let buffer = '';
+  for(const step of seq){
+    if(eng.type === 'ime'){
+      const ch = charFromCode(step.code, step.shift);
+      if(ch === undefined) return null;
+      buffer = eng.processChar(buffer, ch, false, step.shift);
+    }else{
+      const emitted = eng.press(step.code, step.shift);
+      if(emitted === undefined) return null;
+      buffer += emitted.replace(/\r/g, '\n');
+    }
+  }
+  return buffer;
+}
+
+/* like hintSimulate but also captures the engine's hidden state, which is
+   what the next keystroke's behaviour depends on: for IMEs the context tail,
+   for keymaps the pending action-state / dead-key sequence. */
+function hintEngineState(seq){
+  const eng = createEngine();
+  let buffer = '';
+  for(const step of seq){
+    if(eng.type === 'ime'){
+      const ch = charFromCode(step.code, step.shift);
+      if(ch === undefined) return null;
+      buffer = eng.processChar(buffer, ch, false, step.shift);
+    }else{
+      const emitted = eng.press(step.code, step.shift);
+      if(emitted === undefined) return null;
+      buffer += emitted.replace(/\r/g, '\n');
+    }
+  }
+  if(eng.type === 'ime') return { seq, buf: buffer, ctx: eng.ctx };
+  return { seq, buf: buffer, st: eng.state, sq: eng.seq };
+}
+
+/* A partial commit may keep growing toward `goal` only if it already looks
+   like a prefix of it — allowing one trailing virama/nukta overshoot, which
+   the engines later fold into the matra. IME intermediates can also be raw
+   ASCII (e.g. `~` before `~g` → ಙ್) that a rule will later consume, so keep
+   those too. */
+let imePrefixSet = null;
+function imeAsciiPrefixes(){
+  if(!imePrefixSet){
+    const set = new Set(['']);
+    for(const grp of [LAYOUT.patterns || [], LAYOUT.patterns_shift || [], LAYOUT.patterns_x || []]){
+      for(const rule of grp){
+        const inp = String(rule[0]).replace(/\\(.)/g, '$1');
+        for(let i = 1; i <= inp.length; i++) set.add(inp.slice(0, i));
+      }
+    }
+    imePrefixSet = set;
+  }
+  return imePrefixSet;
+}
+
+/* IMEs build aspirates/conjuncts by substitution (ಟ್+h → ಠ್, ಶ್+h → ಷ್), so
+   the committed text at mid-step need not be a literal prefix of the goal.
+   Normalising consonants to their unaspirated base keeps those states alive. */
+const IME_SKEL = { 'ಖ':'ಕ','ಘ':'ಗ','ಙ':'ಕ','ಛ':'ಚ','ಝ':'ಜ','ಞ':'ಚ','ಠ':'ಟ','ಢ':'ಡ','ಣ':'ಟ','ಥ':'ತ','ಧ':'ದ','ಭ':'ಬ','ಶ':'ಸ','ಷ':'ಸ','ೞ':'ಳ','ಱ':'ರ' };
+function hintSkel(s){
+  let out = '';
+  for(const c of s) out += IME_SKEL[c] || c;
+  return out;
+}
+
+function hintCompat(buf, goal){
+  if(goal.startsWith(buf) || buf.startsWith(goal)) return true;
+  if(LAYOUT.type === 'ime'){
+    /* split off any trailing ASCII run — it is a dead-key prefix that a rule
+       will consume (e.g. `ಕ` + backtick → `ಕ` + `\` → ಕೊ); the Kannada part
+       must still be extendable toward the goal's skeleton */
+    const asciiRun = (/[\x20-\x7E]*$/).exec(buf)[0];
+    const kn = buf.slice(0, buf.length - asciiRun.length);
+    if(!imeAsciiPrefixes().has(asciiRun)) return false;
+    const bSkel = hintSkel(kn).replace(/[\u0CBC\u0CCD]/g, '');
+    const gSkel = hintSkel(goal).replace(/[\u0CBC\u0CCD]/g, '');
+    return gSkel.startsWith(bSkel) || bSkel.startsWith(gSkel);
+  }
+  if(buf.length > goal.length + 1) return false;
+  const stripped = buf.replace(/[\u0CBC\u0CCD]/g, '');
+  return goal.startsWith(stripped) || stripped.startsWith(goal);
+}
+
+/* Find a key sequence that grows the committed buffer from prev to `goal`.
+   The IME engine composes (e.g. `~` → `~g` → ಙ್ → ಙ), so intermediate text
+   may not look like a prefix of the goal; we still prune aggressively, and
+   dedupe states by (committed buffer, engine hidden state) so the bounded
+   frontier explores distinct engine states rather than raw key sequences. */
+function hintExtend(prev, goal, seq, maxDepth){
+  const cap = maxDepth || 5;
+  const seen = new Set();
+  const start = hintEngineState(seq);
+  if(start === null) return null;
+  let frontier = [start];
+  for(let depth = 0; depth < cap; depth++){
+    const next = [];
+    let overflow = false;
+    for(const s of frontier){
+      for(const k of HINT_KEYS){
+        const cand = s.seq.concat([k]);
+        const st = hintEngineState(cand);
+        if(st === null) continue;
+        if(st.buf === goal) return cand;
+        if(!hintCompat(st.buf, goal)) continue;
+        const dk = (st.st !== undefined)
+          ? st.buf + '\u0001' + st.st + '\u0001' + st.sq
+          : st.buf + '\u0001' + st.ctx;
+        if(seen.has(dk)) continue;
+        seen.add(dk);
+        next.push(st);
+        if(next.length > 20000){ overflow = true; break; }
+      }
+      if(overflow) break;
+    }
+    if(overflow || next.length === 0) break;
+    frontier = next;
+  }
+  return null;
+}
+
+function hintForItem(item){
+  const key = SEL + '|' + item.t;
+  if(HINT_CACHE.has(key)) return HINT_CACHE.get(key);
+  let seq = null;
+  if(LAYOUT.type === 'keymap'){
+    /* KGP commits a bare consonant (inherent ಅ) via the next key, so a word
+       can't be hinted grapheme-by-grapheme. Chain per whitespace-delimited
+       run, attaching each space to the word that precedes it: the space is
+       itself the key that commits a trailing consonant, so the run ends in a
+       clean engine state ready for the next run. */
+    const tokens = item.t.split(/(\s)/);
+    const chunks = [];
+    for(let i = 0; i < tokens.length; i += 2){
+      chunks.push(tokens[i] + ((tokens[i+1] !== undefined) ? tokens[i+1] : ''));
+    }
+    let acc = [];
+    let committed = '';
+    for(const chunk of chunks){
+      const ext = hintExtend(committed, committed + chunk, acc, Math.min(chunk.length + 3, 12));
+      if(!ext){ seq = null; break; }
+      acc = ext;
+      committed += chunk;
+      seq = acc;
+    }
+  }else{
+    const graphemes = graphemeSplit(item.t);
+    let acc = [];
+    let committed = '';
+    for(const g of graphemes){
+      const ext = hintExtend(committed, committed + g, acc);
+      if(!ext){ seq = null; break; }
+      acc = ext;
+      committed += g;
+      seq = acc;
+    }
+  }
+  const hint = seq ? seq.map(s => hintKeyLabel(s.code, s.shift)).join(' ') : null;
+  HINT_CACHE.set(key, hint);
+  return hint;
+}
+
 function loadLevel(idx){
-  curLevel = idx; curItem = 0;
+  curLevel = idx; curItem = 0; practiceActive = true;
   document.querySelectorAll('.level-chip').forEach((c,i)=>c.classList.toggle('active', i===idx));
   sessionStart = null; totalTypedChars = 0; correctChars = 0; attemptedKeystrokes = 0; streak = 0;
   updateStats();
@@ -793,10 +993,22 @@ function showItem(){
   const item = level.items[curItem];
   targetWordEl.innerHTML = Array.from(item.t).map(()=>'').join('');
   renderTargetPlain(item.t);
-  targetTranslitEl.textContent = item.tr || '';
+  renderHint(item);
   levelProgress.style.width = (curItem / level.items.length * 100) + '%';
   statDone.textContent = `${curItem}/${level.items.length}`;
   practiceSurface.setText('');
+}
+
+function renderHint(item){
+  const meaning = item.tr || '';
+  const hint = hintForItem(item);
+  if(hint){
+    targetTranslitEl.innerHTML =
+      `<span class="hint-keys"><kbd>${escapeHtml(hint)}</kbd></span>` +
+      (meaning ? `<span class="hint-meaning"> · ${escapeHtml(meaning)}</span>` : '');
+  }else{
+    targetTranslitEl.textContent = meaning || '';
+  }
 }
 
 function renderTargetPlain(target){

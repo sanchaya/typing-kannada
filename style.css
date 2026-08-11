@@ -335,6 +335,16 @@ h2.section-title{
 .target-word span.wrong{color:var(--bad);text-decoration:underline wavy var(--bad);}
 .target-word span.todo{color:var(--ink);opacity:.32;}
 .translit{margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink-soft);}
+.hint-keys kbd{
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;font-weight:600;
+  color:var(--primary);
+  background:rgba(78,205,196,0.08);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:2px 8px;
+}
+.hint-meaning{color:var(--ink-soft);}
 
 .stats-row{display:flex;gap:14px;margin:18px 0;flex-wrap:wrap;}
 .stat{
