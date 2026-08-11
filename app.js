@@ -1,8 +1,8 @@
 /* ============================================================
-   ಕೀಲಿಕನ್ನಡ — Kannada typing tutor
+   ಕೀಲಿಕನ್ನಡ - Kannada typing tutor
    Data-driven, multi-layout. A registry (data/layouts.json) lists
    every layout; each layout's full config (keymap state machine OR
-   jquery.IME rule set, historic sequences, examples, findings) lives
+   jquery.IME rule set, historic sequences, examples) lives
    in data/layouts/<id>.json. This app is a thin, generic shell:
    - type "keymap"  → a faithful re-implementation of the KPRao/KGP/Nudi
      macOS .keylayout action/terminator state machine.
@@ -38,7 +38,7 @@ try{
   }catch(e){ /* localStorage unavailable */ }
   LAYOUT = await loadLayout(SEL);
 }catch(err){
-  document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;">Could not load the layout registry (<code>data/layouts.json</code>). If you opened this file directly (file://), run a local static server instead — e.g. <code>python3 -m http.server</code> — then visit http://localhost:8080. On GitHub Pages this loads automatically.</p>';
+  document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;">Could not load the layout registry (<code>data/layouts.json</code>). If you opened this file directly (file://), run a local static server instead - e.g. <code>python3 -m http.server</code> - then visit http://localhost:8080. On GitHub Pages this loads automatically.</p>';
   throw err;
 }
 
@@ -93,7 +93,7 @@ function charFromCode(code, shift){
 
 /* Every assigned codepoint in the Kannada block (U+0C80–U+0CFF), the master
    reference list. Reachability per layout is computed dynamically by
-   buildCoverage() — the app never hardcodes which letters a layout types. */
+   buildCoverage() - the app never hardcodes which letters a layout types. */
 const UNICODE_COVERAGE = [
   { cp:'U+0C80', ch:'ಀ', name:'Spacing candrabindu' },
   { cp:'U+0C81', ch:'ಁ', name:'Candrabindu' },
@@ -436,16 +436,16 @@ function renderReferenceRow(){
   const hasBackquote = refs.some(([,m])=> m.layer === 'backquote');
   const hasAlt = refs.some(([,m])=> m.layer === 'altgr');
   let label;
-  if(refs.every(([,m])=> m.layer === 'backquote')) label = `ಐತಿಹಾಸಿಕ · <b>${refs.length}</b> — type <kbd>\`</kbd> then the key:`;
-  else if(refs.every(([,m])=> m.layer === 'altgr')) label = `ಐತಿಹಾಸಿಕ · <b>${refs.length}</b> — hold <kbd>⌥</kbd> and press the key:`;
-  else label = `ವಿಶೇಷ & ಐತಿಹಾಸಿಕ · <b>${refs.length}</b> — type as shown:`;
+  if(refs.every(([,m])=> m.layer === 'backquote')) label = `ಐತಿಹಾಸಿಕ · <b>${refs.length}</b> - type <kbd>\`</kbd> then the key:`;
+  else if(refs.every(([,m])=> m.layer === 'altgr')) label = `ಐತಿಹಾಸಿಕ · <b>${refs.length}</b> - hold <kbd>⌥</kbd> and press the key:`;
+  else label = `ವಿಶೇಷ & ಐತಿಹಾಸಿಕ · <b>${refs.length}</b> - type as shown:`;
   const row = document.createElement('div');
   row.className = 'kbd-ref-row';
   row.innerHTML = `<span class="kbd-ref-label">${label}</span>` +
     refs.map(([ch, m])=>{
       const u = UNICODE_COVERAGE.find(x=>x.ch === ch);
       const glyph = (ch === '\u200c' || ch === '\u200d') ? (ch === '\u200d' ? 'ZWJ' : 'ZWNJ') : ch;
-      return `<span class="kbd-ref" title="U+${((u&&u.cp)||'??').slice(2)} ${u ? 'KANNADA ' + u.name : ''} — ${m.stroke || 'no stroke'}"><b class="ref-glyph">${glyph}</b>` +
+      return `<span class="kbd-ref" title="U+${((u&&u.cp)||'??').slice(2)} ${u ? 'KANNADA ' + u.name : ''} - ${m.stroke || 'no stroke'}"><b class="ref-glyph">${glyph}</b>` +
         (m.stroke ? `<span class="ref-stroke"><kbd>${escapeHtml(m.stroke)}</kbd></span>` : '') +
         `</span>`;
     }).join('');
@@ -601,7 +601,6 @@ function syncLayoutUI(){
     resetShiftToggle();
     renderComplex();
     renderUnicode();
-    renderReview();
   }catch(err){ console.error('syncLayoutUI error:', err); }
 }
 
@@ -636,7 +635,7 @@ const kbLayout = document.getElementById('kbLayout');
 renderKeyboard(kbLayout);
 
 const layoutSurface = attachTypingSurface(document.getElementById('surfaceLayout'), kbLayout, {
-  placeholder: 'Start typing — the board below mirrors your physical keyboard live →'
+  placeholder: 'Start typing - the board below mirrors your physical keyboard live →'
 });
 
 /* Respond to the system keyboard directly on the Layout tab, without needing
@@ -699,7 +698,7 @@ function buildPicker(){
 }
 
 /* ============================================================
-   Practice tab — typing tutor
+   Practice tab - typing tutor
    ============================================================ */
 const LEVELS = [
   {
@@ -855,7 +854,7 @@ function hintEngineState(seq){
 }
 
 /* A partial commit may keep growing toward `goal` only if it already looks
-   like a prefix of it — allowing one trailing virama/nukta overshoot, which
+   like a prefix of it - allowing one trailing virama/nukta overshoot, which
    the engines later fold into the matra. IME intermediates can also be raw
    ASCII (e.g. `~` before `~g` → ಙ್) that a rule will later consume, so keep
    those too. */
@@ -887,7 +886,7 @@ function hintSkel(s){
 function hintCompat(buf, goal){
   if(goal.startsWith(buf) || buf.startsWith(goal)) return true;
   if(LAYOUT.type === 'ime'){
-    /* split off any trailing ASCII run — it is a dead-key prefix that a rule
+    /* split off any trailing ASCII run - it is a dead-key prefix that a rule
        will consume (e.g. `ಕ` + backtick → `ಕ` + `\` → ಕೊ); the Kannada part
        must still be extendable toward the goal's skeleton */
     const asciiRun = (/[\x20-\x7E]*$/).exec(buf)[0];
@@ -1057,7 +1056,7 @@ function advance(){
     showItem();
   } else {
     targetWordEl.innerHTML = `<span class="correct">✓ ${level.label} ಮುಗಿದವು!</span>`;
-    targetTranslitEl.textContent = 'Level complete — pick the next level above.';
+    targetTranslitEl.textContent = 'Level complete - pick the next level above.';
     levelProgress.style.width = '100%';
   }
 }
@@ -1135,7 +1134,7 @@ function coverageNoteEl(){
   });
   const note = document.createElement('div');
   note.className = 'coverage-note';
-  note.innerHTML = `<b>ಒಟ್ಟು ${UNICODE_COVERAGE.length}</b> assigned codepoints in the Kannada block — <b>${baseN}</b> on this layout's keys · <b>${histN}</b> historic/special via a modifier (shown below) · <b>${noneN}</b> no dedicated key (compose by typing):`;
+  note.innerHTML = `<b>ಒಟ್ಟು ${UNICODE_COVERAGE.length}</b> assigned codepoints in the Kannada block - <b>${baseN}</b> on this layout's keys · <b>${histN}</b> historic/special via a modifier (shown below) · <b>${noneN}</b> no dedicated key (compose by typing):`;
   return note;
 }
 function renderUnicode(){
@@ -1153,7 +1152,7 @@ function renderUnicode(){
       else if(m.layer === 'shift') badge = 'hist · ⇧ + key';
     }
     const show = (m&&m.stroke) ? `<span class="u-stroke"><kbd>${escapeHtml(m.stroke)}</kbd></span>` : `<span class="u-code">${u.cp}</span>`;
-    cell.title = (m && m.stroke) ? `${u.cp} KANNADA ${u.name} — type ${m.stroke}` : `${u.cp} KANNADA ${u.name}${m ? '' : ' — no dedicated key; compose by typing'}`;
+    cell.title = (m && m.stroke) ? `${u.cp} KANNADA ${u.name} - type ${m.stroke}` : `${u.cp} KANNADA ${u.name}${m ? '' : ' - no dedicated key; compose by typing'}`;
     cell.innerHTML = `
       <span class="u-glyph">${u.ch}</span>
       ${show}
@@ -1167,27 +1166,13 @@ function renderUnicode(){
    Free type tab
    ============================================================ */
 const freeSurface = attachTypingSurface(document.getElementById('surfaceFree'), null, {
-  placeholder: 'ಇಲ್ಲಿ ಬರೆಯಿರಿ — start typing here →'
+  placeholder: 'ಇಲ್ಲಿ ಬರೆಯಿರಿ - start typing here →'
 });
 document.getElementById('clearFreeBtn').addEventListener('click', ()=> freeSurface.setText(''));
 document.getElementById('copyFreeBtn').addEventListener('click', ()=>{
   const text = freeSurface.getText();
   navigator.clipboard && navigator.clipboard.writeText(text).catch(()=>{});
 });
-
-/* ============================================================
-   Review tab content
-   ============================================================ */
-const reviewListEl = document.getElementById('reviewList');
-function renderReview(){
-  reviewListEl.innerHTML = '';
-  (LAYOUT.findings || []).forEach(f=>{
-    const div = document.createElement('div');
-    div.className = 'finding ' + f.sev;
-    div.innerHTML = `<h3><span class="sev">${escapeHtml(f.sevLabel)}</span>${escapeHtml(f.title)}</h3>${f.body}`;
-    reviewListEl.appendChild(div);
-  });
-}
 
 /* ============================================================
    Boot

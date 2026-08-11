@@ -414,7 +414,7 @@
    "tag": "Positional mapping",
    "word": "ಕ",
    "gloss": "ka on K",
-   "built": "Enhanced InScript keeps the same positional base as plain InScript — ಕ on K.",
+   "built": "Enhanced InScript keeps the same positional base as plain InScript - ಕ on K.",
    "keys": [
     "k"
    ]
@@ -422,7 +422,7 @@
   {
    "tag": "Conjunct shortcut",
    "word": "ಕ್ಷ",
-   "gloss": "kSa — & types ಕ್ಷ directly",
+   "gloss": "kSa - & types ಕ್ಷ directly",
    "built": "Enhanced InScript adds the ಕ್ಷ ligature to the & key (plain InScript only gives ಕ್ರ there).",
    "keys": [
     "&"
@@ -431,7 +431,7 @@
   {
    "tag": "Conjunct shortcut",
    "word": "ಜ್ಞ",
-   "gloss": "jña — % types ಜ್ಞ",
+   "gloss": "jña - % types ಜ್ಞ",
    "built": "% yields the famous jña ligature; * gives ಶ್ರ and # gives ರ. All the calligraphic conjuncts sit on the number row.",
    "keys": [
     "%"
@@ -440,8 +440,8 @@
   {
    "tag": "Alt-layer conjunct",
    "word": "ಶ್ರ",
-   "gloss": "śra — * on the base row",
-   "built": "* types ಶ್ರ in one key — most of InScript\troublesome ligatures are one keystroke here.",
+   "gloss": "śra - * on the base row",
+   "built": "* types ಶ್ರ in one key - most of InScript\troublesome ligatures are one keystroke here.",
    "keys": [
     "*"
    ]
@@ -449,7 +449,7 @@
   {
    "tag": "ZWJ/ZWNJ",
    "word": "‍",
-   "gloss": "zero-width joiner — ⌥ + 1",
+   "gloss": "zero-width joiner - ⌥ + 1",
    "built": "ZWJ sits on the Alternate layer: hold ⌥ and press 1. After a consonant this gives a visible standalone halant (type it, then the next letter to join).",
    "keys": [
     {
@@ -461,8 +461,8 @@
   {
    "tag": "ZWJ/ZWNJ",
    "word": "‌",
-   "gloss": "zero-width non-joiner — ⌥ + 2",
-   "built": "ZWNJ on ⌥+2 prevents ligation — the parallel of KGP's double-virama trick.",
+   "gloss": "zero-width non-joiner - ⌥ + 2",
+   "built": "ZWNJ on ⌥+2 prevents ligation - the parallel of KGP's double-virama trick.",
    "keys": [
     {
      "label": "2",

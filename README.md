@@ -1,12 +1,12 @@
-# ಕೀಲಿಕನ್ನಡ — Kannada Typing Tutor
+# ಕೀಲಿಕನ್ನಡ - Kannada Typing Tutor
 
-An interactive typing tutor for four real Kannada layouts. Practise on your own physical keyboard, watch a virtual keyboard light up, and build typing speed — no installation of the actual keyboard layout required.
+An interactive typing tutor for four real Kannada layouts. Practise on your own physical keyboard, watch a virtual keyboard light up, and build typing speed - no installation of the actual keyboard layout required.
 
 **Included layouts:**
 
 | Layout | Type | What it is |
 | --- | --- | --- |
-| ಕೆಜಿಪಿ (kgp) | keymap | The KPRao/KGP/Nudi family — type by sound (`k→ಕ`, `A→ಾ`, `f→್`). Built directly from the [KPRao/KGP macOS keyboard layout](https://github.com/sanchaya/KPRao-KGP-Keyboard-Layout-for-Mac). |
+| ಕೆಜಿಪಿ (kgp) | keymap | The KPRao/KGP/Nudi family - type by sound (`k→ಕ`, `A→ಾ`, `f→್`). Built directly from the [KPRao/KGP macOS keyboard layout](https://github.com/sanchaya/KPRao-KGP-Keyboard-Layout-for-Mac). |
 | InScript (inscript) | rule-based | The Government of India standard position-based layout. |
 | InScript 2 (inscript2) | rule-based | The updated InScript standard with conjunct and ZWJ/ZWNJ shortcuts on a modifier layer. |
 | Transliteration (transliteration) | rule-based | Phonetic/ITRANS-style typing (`k a n n a D a` → ಕನ್ನಡ). |
@@ -16,24 +16,24 @@ The app is split into a generic engine and pure-data layout definitions, so a ne
 **Live structure** (plain static files, no build step, no dependencies):
 
 ```
-index.html                 — page markup
-style.css                   — all styling
-app.js                      — generic engine (two strategies) + tutor logic
-data/layouts.json           — registry: order, names, descriptions, tags
-data/layouts/kgp.json       — KGP keymap (actions/terminators + historic key seq)
-data/layouts/inscript.json       — InScript rules (ported from jquery.ime)
-data/layouts/inscript2.json      — InScript 2 rules (ported from jquery.ime)
-data/layouts/transliteration.json — Phonetic transliteration rules (ported from jquery.ime)
+index.html                 - page markup
+style.css                   - all styling
+app.js                      - generic engine (two strategies) + tutor logic
+data/layouts.json           - registry: order, names, descriptions, tags
+data/layouts/kgp.json       - KGP keymap (actions/terminators + historic key seq)
+data/layouts/inscript.json       - InScript rules (ported from jquery.ime)
+data/layouts/inscript2.json      - InScript 2 rules (ported from jquery.ime)
+data/layouts/transliteration.json - Phonetic transliteration rules (ported from jquery.ime)
 ```
 
 ## Publish on GitHub Pages
 
-1. Push this repo's `main` branch (keep the folder structure as-is — `app.js` fetches `data/layouts.json` and `data/layouts/*.json` by relative path).
+1. Push this repo's `main` branch (keep the folder structure as-is - `app.js` fetches `data/layouts.json` and `data/layouts/*.json` by relative path).
 2. In the repo, go to **Settings → Pages**.
 3. Under **Build and deployment**, set **Source** to `Deploy from a branch`, pick your branch (usually `main`) and folder `/ (root)`.
 4. Save. GitHub will give you a URL like `https://<username>.github.io/<repo>/` within a minute or two.
 
-That's the whole setup — everything here is static HTML/CSS/JS, so there's no server, no npm install, no build step.
+That's the whole setup - everything here is static HTML/CSS/JS, so there's no server, no npm install, no build step.
 
 ## Running it locally before you push
 
@@ -48,12 +48,12 @@ or any equivalent static server (`npx serve`, VS Code's Live Server extension, e
 
 ## What's inside
 
-- **Layout picker** — in the header, across every tab. Your choice is remembered in `localStorage`, the virtual keyboards re-render, and all three typing surfaces switch engines immediately.
-- **Layout tab** — the current layout's full keyboard (base + Shift legends), a reference strip for the historic/modifier entries (backquote `` ` `` on ಕೆಜಿಪಿ, ⌥ Alternate on the IME layouts), and a live test box that mirrors your physical keyboard. A digit switch on this tab toggles the number row between the layout's Kannada digits (೧೨೩) and Western digits (123).
-- **Practice tab** — a 5-level typing tutor (vowels → consonants → consonant+vowel combinations → words → sentences) with WPM, accuracy, and streak tracking. Targets are Kannada text; the current layout's engine decides what your keystrokes produce.
-- **Free Type tab** — an open canvas with grapheme-aware Backspace (removes one full akshara at a time).
-- **Unicode tab** — all 91 assigned codepoints in the Kannada block, showing whether the selected layout produces each on a key, via a modifier, or not at all (with the keystroke to type it).
-- **Review Notes tab** — per-layout notes. For ಕೆಜಿಪಿ, an audit of the source `.keylayout`: a couple of malformed-XML bugs, dead code, an incomplete feature, and a coverage gap. For the IME layouts, notes at the edge of what the standard implementations do — including which historic letters live on the ⌥ Alternate layer.
+- **Layout picker** - in the header, across every tab. Your choice is remembered in `localStorage`, the virtual keyboards re-render, and all three typing surfaces switch engines immediately.
+- **Layout tab** - the current layout's full keyboard (base + Shift legends), a reference strip for the historic/modifier entries (backquote `` ` `` on ಕೆಜಿಪಿ, ⌥ Alternate on the IME layouts), and a live test box that mirrors your physical keyboard. A digit switch on this tab toggles the number row between the layout's Kannada digits (೧೨೩) and Western digits (123).
+- **Practice tab** - a 5-level typing tutor (vowels → consonants → consonant+vowel combinations → words → sentences) with WPM, accuracy, and streak tracking. Targets are Kannada text; the current layout's engine decides what your keystrokes produce.
+- **Free Type tab** - an open canvas with grapheme-aware Backspace (removes one full akshara at a time).
+- **Unicode tab** - all 91 assigned codepoints in the Kannada block, showing whether the selected layout produces each on a key, via a modifier, or not at all (with the keystroke to type it).
+- **Layout data & review notes** - each layout's `data/layouts/<id>.json` also carries a `findings` array: the per-layout audit trail (bugs found and fixed, design notes, scope decisions). Kept in the repo only; not surfaced in the portal UI.
 
 ## Layout data provenance
 
@@ -67,6 +67,6 @@ Each layout is pinned by a git tag so consumers can depend on a specific definit
 Layout files are plain JSON. The engine reads a small in-file contract:
 
 - **keymap** files (`kgp`): `keymap0`/`keymap1` (code → `{type:'output',value}` or `{type:'state' …}`), `actions`, `terminators`, `historicPrefixCode`/`historicPrefixChar`, `historicSeq` (keyed by `code*2 + shift`).
-- **IME** files (the other three): `patterns`/`patterns_x`/`patterns_shift` with jquery.ime semantics — 2-element rules `[input, replacement]`, 3-element `[input, contextRegex, replacement]`; `maxKeyLength` and `contextLength` default to `1`/`0` if absent.
+- **IME** files (the other three): `patterns`/`patterns_x`/`patterns_shift` with jquery.ime semantics - 2-element rules `[input, replacement]`, 3-element `[input, contextRegex, replacement]`; `maxKeyLength` and `contextLength` default to `1`/`0` if absent.
 
-If the upstream data changes, re-port from the source rather than hand-editing — the Review Notes tab lists the known quirks each file already accounts for.
+If the upstream data changes, re-port from the source rather than hand-editing - each file's `findings` array lists the known quirks the data already accounts for.

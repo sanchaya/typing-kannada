@@ -390,7 +390,7 @@
   {
    "tag": "Positional mapping",
    "word": "ಕ",
-   "gloss": "ka — InScript puts ಕ on the physical K key (K→ಕ)",
+   "gloss": "ka - InScript puts ಕ on the physical K key (K→ಕ)",
    "built": "InScript is positional: every key maps to a fixed letter. ಕ sits on K; its aspirate ಖ on shift+K.",
    "keys": [
     "k"
@@ -399,7 +399,7 @@
   {
    "tag": "Vowel sign",
    "word": "ಕಾ",
-   "gloss": "kā — the ā-sign (಼a) is on E",
+   "gloss": "kā - the ā-sign (಼a) is on E",
    "built": "Consonant vowel-signs have their own keys: typing e after a consonant adds ಾ, so k + e = ಕಾ.",
    "keys": [
     "k",
@@ -409,7 +409,7 @@
   {
    "tag": "Vowel sign",
    "word": "ಕಿ",
-   "gloss": "ki — short i is on F",
+   "gloss": "ki - short i is on F",
    "built": "k + f = ಕಿ; like ā, the short-i sign is a dedicated InScript key, not a combination.",
    "keys": [
     "k",
@@ -419,7 +419,7 @@
   {
    "tag": "Conjunct shortcut",
    "word": "ಕ್ರ",
-   "gloss": "kra — & is a dedicated conjunct key",
+   "gloss": "kra - & is a dedicated conjunct key",
    "built": "InScript bakes the most common conjuncts into single keys (& = ಕ್ರ). Same idea as KGP's action keys.",
    "keys": [
     "&"
@@ -428,7 +428,7 @@
   {
    "tag": "Conjunct by spelling",
    "word": "ಕ್ಷ",
-   "gloss": "kSa — virama on d, then ಷ on ,",
+   "gloss": "kSa - virama on d, then ಷ on ,",
    "built": "Type the virama key (d) between two consonants to build any conjunct: k + d + , = ಕ್ಷ. This is the general InScript way.",
    "keys": [
     "k",
@@ -439,7 +439,7 @@
   {
    "tag": "Historic letter",
    "word": "ಱ",
-   "gloss": "rra — survives on shift+J",
+   "gloss": "rra - survives on shift+J",
    "built": "ಱ (the old rra) is preserved on J in the InScript keymap, alongside modern ಙ/E, ನ, ಳ etc.",
    "keys": [
     "J"
@@ -450,14 +450,14 @@
   {
    "sev": "info",
    "sevLabel": "Layout family",
-   "title": "InScript (IS 16394) — the government-standard positional layout",
-   "body": "<p>Every key maps to one fixed Kannada letter, so the mapping is positional rather than phonetic — it matches the InScript wiring in Windows/Linux and the Wikimedia jQuery.IME <code>kn-inscript</code> rule set this data was generated from.</p><p><b>Data fix applied:</b> the upstream alternate-layer entry for key <code>F</code> was a malformed escape (<code>\\uC88C</code>, which renders as a Hangul syllable); corrected to <code>ಌ</code> (U+0C8C VOCALIC L), matching the enhanced variant and the ISCII historic set.</p>"
+   "title": "InScript (IS 16394) - the government-standard positional layout",
+   "body": "<p>Every key maps to one fixed Kannada letter, so the mapping is positional rather than phonetic - it matches the InScript wiring in Windows/Linux and the Wikimedia jQuery.IME <code>kn-inscript</code> rule set this data was generated from.</p><p><b>Data fix applied:</b> the upstream alternate-layer entry for key <code>F</code> was a malformed escape (<code>\\uC88C</code>, which renders as a Hangul syllable); corrected to <code>ಌ</code> (U+0C8C VOCALIC L), matching the enhanced variant and the ISCII historic set.</p>"
   },
   {
    "sev": "ok",
    "sevLabel": "Historic layer",
    "title": "Historic and rare letters live on the Alternate (⌥/AltGr) layer",
-   "body": "<p>ಌ ಽ ೄ ೞ ೠ ೡ ೢ ೣ ೱ ೲ (and ₹) are reachable by holding ⌥ (Alt) plus the shown key — the reference strip below the keyboard maps each one. ಱ is actually on the base layer at shift+J.</p>"
+   "body": "<p>ಌ ಽ ೄ ೞ ೠ ೡ ೢ ೣ ೱ ೲ (and ₹) are reachable by holding ⌥ (Alt) plus the shown key - the reference strip below the keyboard maps each one. ಱ is actually on the base layer at shift+J.</p>"
   },
   {
    "sev": "ok",

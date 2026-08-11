@@ -523,7 +523,7 @@
   {
    "tag": "ITRANS-style",
    "word": "ಕನ್ನಡ",
-   "gloss": "kannaDa — the everyday sequence",
+   "gloss": "kannaDa - the everyday sequence",
    "built": "Each Roman letter maps to a Kannada letter: k→ಕ್, a→ಕ, n→ನ್, n→ನ್ನ, a→ನ್ನ, D→ಣ್, a→ಣ.",
    "keys": [
     "k",
@@ -538,8 +538,8 @@
   {
    "tag": "ITRANS-style",
    "word": "ಕ್ಷ",
-   "gloss": "kSha — spell it, get the conjunct",
-   "built": "k S h → ಕ್ಷ್, then a strips the halant: k-S-h-a = ಕ್ಷ. No virama key needed — the layout composes it from the spelling.",
+   "gloss": "kSha - spell it, get the conjunct",
+   "built": "k S h → ಕ್ಷ್, then a strips the halant: k-S-h-a = ಕ್ಷ. No virama key needed - the layout composes it from the spelling.",
    "keys": [
     "k",
     "S",
@@ -550,7 +550,7 @@
   {
    "tag": "ITRANS-style",
    "word": "ಜ್ಞ",
-   "gloss": "jñ — the classic jña, via ~ between j's",
+   "gloss": "jñ - the classic jña, via ~ between j's",
    "built": "Type j then ~ then j then a: the ~ marks the ñ-ly-sound and the pair j-combines into the famous ಜ್ಞ ligature.",
    "keys": [
     "j",
@@ -562,7 +562,7 @@
   {
    "tag": "Long vowels",
    "word": "ನೀರು",
-   "gloss": "nīru — double the vowel for the long sign",
+   "gloss": "nīru - double the vowel for the long sign",
    "built": "A doubled vowel key makes the long form: n + i + i = ನೀ. This is the transliteration way of getting ೀ/ೂ long signs: type the matra twice.",
    "keys": [
     "n",
@@ -575,7 +575,7 @@
   {
    "tag": "Vocalic matra",
    "word": "ಕೃಷಿ",
-   "gloss": "kṛṣi — vocalic-r on R",
+   "gloss": "kṛṣi - vocalic-r on R",
    "built": "k + R gives ಕೃ (the vocalic-r sign); then Sh gives ಷ्, then i strips the halant: ಕೃಷಿ.",
    "keys": [
     "k",
@@ -601,7 +601,7 @@
    "sev": "info",
    "sevLabel": "Layout family",
    "title": "Transliteration (ITRANS-style)",
-   "body": "<p>No positional keys to memorise — you spell Kannada (or ITRANS) in Roman letters and the engine composes the script. Byte-for-byte the Wikimedia jQuery.IME <code>kn-transliteration</code> rule set (M G Harish, HP Nadig).</p><p>Vowels are context-aware: a capital vowel key gives the independent form (A→ಆ, D→ಅ) — and its lowercase version after a consonant gives the vowel sign.</p>"
+   "body": "<p>No positional keys to memorise - you spell Kannada (or ITRANS) in Roman letters and the engine composes the script. Byte-for-byte the Wikimedia jQuery.IME <code>kn-transliteration</code> rule set (M G Harish, HP Nadig).</p><p>Vowels are context-aware: a capital vowel key gives the independent form (A→ಆ, D→ಅ) - and its lowercase version after a consonant gives the vowel sign.</p>"
   },
   {
    "sev": "ok",
