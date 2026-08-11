@@ -441,8 +441,8 @@
    "value": "\t"
   },
   "49": {
-   "type": "action",
-   "value": "5"
+   "type": "output",
+   "value": " "
   },
   "50": {
    "type": "output",
@@ -462,26 +462,6 @@
   }
  },
  "actions": {
-  "5": {
-   "none": {
-    "output": " "
-   },
-   "State 1": {
-    "output": "´"
-   },
-   "State 2": {
-    "output": "`"
-   },
-   "State 3": {
-    "output": "ˆ"
-   },
-   "State 4": {
-    "output": "¨"
-   },
-   "State 5": {
-    "output": "˜"
-   }
-  },
   "ಅ": {
    "none": {
     "next": "ಅ"
@@ -2870,10 +2850,10 @@
    "body": "<p>Two <code>output</code> attributes reference an undefined entity <code>&amp;x200c;</code> / <code>&amp;x200D;</code> — missing the <code>#</code> that makes it a numeric character reference. As written, this is not valid XML: a strict parser (and some build/import tools) will reject the file outright rather than silently treating it as the intended zero-width joiner / non-joiner.</p><pre>Line ~367:  &lt;key code=\"3\" output=\"&amp;x200c;\"/&gt;                (Caps layer, F key)\nLine ~1673: &lt;when state=\"none\" output=\"&amp;x200D;\"/&gt;   (nukta/ವಿಶೇಷ action)</pre><p>Fix: change both to proper numeric character references — <code>&amp;#x200c;</code> (ZWNJ) and <code>&amp;#x200D;</code> (ZWJ). This tutor's engine patches both automatically so the demo above behaves correctly, but the source <code>.keylayout</code> file itself still needs the correction before it's recompiled into an installer.</p>"
   },
   {
-   "sev": "warn",
-   "sevLabel": "Dead code",
-   "title": "Shift+Space is wired to an unreachable dead-key state machine",
-   "body": "<p>The <code>Shift+Space</code> key (Caps-layer index 1, code 49) is mapped to an action (\"5\") with five branches for <code>State 1</code> through <code>State 5</code>, intended to type spacing accent marks (´ ` ˆ ¨ ˜). But nothing anywhere in the file ever transitions the state machine into <code>State 1</code>–<code>State 5</code> — no key's <code>next</code> ever produces those names. The branches can never fire.</p><p>In practice, <code>Shift+Space</code> today just always outputs a plain space — the dead branches are inert, but they're also confusing for anyone maintaining the layout later, and they hint at an unfinished feature (a dead-key row for diacritics) that never got wired up.</p><p>Recommendation: either remove the unused branches and simplify <code>Shift+Space</code> to a plain output key, or finish the intended feature by adding the missing state transitions.</p>"
+   "sev": "ok",
+   "sevLabel": "Fixed · was \"dead code\"",
+   "title": "Shift+Space simplified to a plain space key — dead-key state machine removed",
+   "body": "<p><code>Shift+Space</code> (Caps-layer index 1, code 49) used to route through an action (\"5\") with five branches for <code>State 1</code> through <code>State 5</code>, intended to type spacing accent marks (´ ` ˆ ¨ ˜). Nothing anywhere in the file ever transitioned into those states, so the branches could never fire — <code>Shift+Space</code> always just output a plain space.</p><p><b>Fix applied:</b> the key is now a plain output key that emits a space, and the dead action \"5\" and its five unreachable state branches have been removed from <code>keymap1</code> and <code>actions</code>. Behaviour is unchanged; the layout file is simply honest now.</p>"
   },
   {
    "sev": "ok",
