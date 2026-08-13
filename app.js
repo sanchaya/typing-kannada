@@ -30,25 +30,38 @@ let SEL = 'kgp';
 const DIGIT_ASCII = { 18:'1',19:'2',20:'3',21:'4',22:'6',23:'5',25:'9',26:'7',28:'8',29:'0' };
 let westDigits = false;
 try{
-  REGISTRY = await fetchJson('data/layouts.json');
+  let stored = null;
   try{
-    const stored = localStorage.getItem('typingKannadaLayout');
-    if(stored && REGISTRY.layouts.some(l=>l.id === stored)) SEL = stored;
+    stored = localStorage.getItem('typingKannadaLayout');
     westDigits = localStorage.getItem('typingKannadaDigits') === '1';
   }catch(e){ /* localStorage unavailable */ }
-  LAYOUT = await loadLayout(SEL);
+  /* Fetch the registry and a guessed layout (the stored preference, if any)
+     in parallel - saves a round trip for the common case of a returning
+     visitor whose stored id is still valid. If the guess turns out wrong
+     (no stored id, or a stale one no longer in the registry) we fall back
+     to a second, correctly-targeted fetch below. */
+  const guess = stored || SEL;
+  const [reg, guessedLayout] = await Promise.all([
+    fetchJson('data/layouts.json'),
+    fetchJson('data/layouts/' + guess + '.json').catch(()=> null)
+  ]);
+  REGISTRY = reg;
+  if(stored && REGISTRY.layouts.some(l=>l.id === stored)) SEL = stored;
+  LAYOUT = (guessedLayout && guess === SEL) ? finalizeLayout(guessedLayout, SEL) : await loadLayout(SEL);
 }catch(err){
   document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;">Could not load the layout registry (<code>data/layouts.json</code>). If you opened this file directly (file://), run a local static server instead - e.g. <code>python3 -m http.server</code> - then visit http://localhost:8080. On GitHub Pages this loads automatically.</p>';
   throw err;
 }
 
-async function loadLayout(id){
-  const l = await fetchJson('data/layouts/' + id + '.json');
+function finalizeLayout(l, id){
   l.maxKeyLength = l.maxKeyLength || 1;
   l.contextLength = l.contextLength || 0;
   const reg = REGISTRY.layouts.find(r=>r.id === id);
   if(reg && l.type === undefined) l.type = reg.type;
   return l;
+}
+async function loadLayout(id){
+  return finalizeLayout(await fetchJson('data/layouts/' + id + '.json'), id);
 }
 
 /* JS KeyboardEvent.code -> macOS ANSI virtual keycode used in the .keylayout file */
