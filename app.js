@@ -267,21 +267,39 @@ function keymapEngine(lay){
   };
 }
 
-/* faithful port of jquery.ime transliterate() + keypress flow */
+/* faithful port of jquery.ime transliterate() + keypress flow.
+   Rule regexes are compiled once per layout (cached by object identity - a
+   fresh LAYOUT object arrives on every layout switch, so no invalidation is
+   needed) rather than on every keystroke: this loop runs per keypress and,
+   via the practice-hint search below, up to tens of thousands of times per
+   practice item, so re-parsing the same regex source repeatedly is wasted work. */
+const PATTERN_CACHE = new WeakMap();
+function compileRule(rule){
+  return {
+    re: new RegExp(rule[0] + '$'),
+    ctxRe: rule.length === 3 ? new RegExp(rule[1] + '$') : null,
+    out: rule[rule.length - 1]
+  };
+}
+function compiledPatternSet(layout, altGr, shift){
+  let cache = PATTERN_CACHE.get(layout);
+  if(!cache){ cache = {}; PATTERN_CACHE.set(layout, cache); }
+  const key = altGr ? 'x' : (shift ? 'shift' : 'base');
+  if(cache[key]) return cache[key];
+  let list;
+  if(altGr) list = layout.patterns_x || [];
+  else if(shift && (layout.patterns_shift || []).length) list = (layout.patterns_shift || []).concat(layout.patterns || []);
+  else list = layout.patterns || [];
+  return cache[key] = list.map(compileRule);
+}
 function imeTransliterate(layout, input, context, altGr, shift){
-  const patterns = altGr ? (layout.patterns_x || [])
-    : ((shift && (layout.patterns_shift || []).length)
-        ? layout.patterns_shift.concat(layout.patterns || [])
-        : (layout.patterns || []));
+  const patterns = compiledPatternSet(layout, altGr, shift);
   for(const rule of patterns){
-    const re = new RegExp(rule[0] + '$');
-    if(re.test(input)){
-      if(rule.length === 3){
-        if(new RegExp(rule[1] + '$').test(context)){
-          return { noop:false, output: input.replace(re, rule[rule.length-1]) };
-        }
+    if(rule.re.test(input)){
+      if(rule.ctxRe){
+        if(rule.ctxRe.test(context)) return { noop:false, output: input.replace(rule.re, rule.out) };
       }else{
-        return { noop:false, output: input.replace(re, rule[rule.length-1]) };
+        return { noop:false, output: input.replace(rule.re, rule.out) };
       }
     }
   }
