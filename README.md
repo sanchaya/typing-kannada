@@ -2,6 +2,10 @@
 
 An interactive typing tutor for four real Kannada layouts. Practise on your own physical keyboard, watch a virtual keyboard light up, and build typing speed - no installation of the actual keyboard layout required.
 
+## Documentation
+
+Full docs live in [`docs/`](docs/README.md): a [tutorial](docs/tutorial-learn-kannada-typing.md) for users, a [layout data contract](docs/reference-layout-data-contract.md) for maintainers, a walk-through for [adding a new layout](docs/howto-add-a-layout.md), a [serve-and-publish guide](docs/howto-serve-and-publish.md), and an explanation of the [two typing engines](docs/explanation-typing-engines.md).
+
 **Included layouts:**
 
 | Layout | Type | What it is |
