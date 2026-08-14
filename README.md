@@ -61,7 +61,7 @@ or any equivalent static server (`npx serve`, VS Code's Live Server extension, e
 
 ## Layout data provenance
 
-- `data/layouts/kgp.json` is a plain extraction of the `.keylayout` file's `keyMap`, `actions`, and `terminators` tables (US-ANSI printable keys, codes 0–53), plus the historic-letter sequence. It already patches the original file's `&x200c;` / `&x200D;` bugs.
+- `data/layouts/kgp.json` is a plain extraction of the `.keylayout` file's `keyMap`, `actions`, and `terminators` tables (US-ANSI printable keys, codes 0–51), plus the historic-letter sequence. It already patches the original file's `&x200c;` / `&x200D;` bugs.
 - `data/layouts/{inscript,inscript2,transliteration}.json` are ports of the [jquery.ime](https://github.com/wikimedia/jquery.ime) Kannada rules (Wikimedia), copied byte-for-byte and continuously verified against the upstream sources by a round-trip test. Two deliberate corrections: the InScript `F` key maps to ಌ (upstream shipped a wrong codepoint), and historic letters are documented on the Alternate/⌥ layer.
 
 Each layout is pinned by a git tag so consumers can depend on a specific definition: `kgp-1.0`, `inscript-1.0`, `inscript2-1.0`, `transliteration-1.0`. Update a tag only when its layout data changes.
