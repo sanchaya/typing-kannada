@@ -98,6 +98,7 @@ const US_SHIFT = {
 
 function charFromCode(code, shift){
   if(code === 49) return ' '; /* Space renders on every layout */
+  if(code === 36) return '\n'; /* Enter - keymap layouts handle it via their own tables */
   const base = QWERTY_LABEL[code];
   if(base === undefined) return undefined;
   if(!shift) return base.toLowerCase();
@@ -319,6 +320,12 @@ function imeTransliterate(layout, input, context, altGr, shift){
   return { noop:true, output: input };
 }
 
+/* contextLength 0 means "track no context" - guard it explicitly, since JS
+   treats slice(-0) the same as slice(0) (the whole string, not empty). */
+function boundContext(lay, ctx, ch){
+  return lay.contextLength > 0 ? (ctx + ch).slice(-lay.contextLength) : '';
+}
+
 function imeEngine(lay){
   return {
     type:'ime',
@@ -331,10 +338,15 @@ function imeEngine(lay){
       const input = buffer.slice(-lay.maxKeyLength);
       const candidate = input + ch;
       const res = imeTransliterate(lay, candidate, this.ctx, altGr, shift);
-      this.ctx = (this.ctx + ch).slice(-lay.contextLength);
+      this.ctx = boundContext(lay, this.ctx, ch);
       if(res.noop) return buffer + ch;
       return buffer.slice(0, buffer.length - input.length) + res.output;
     },
+    /* Records a character in the context window without running it through
+       transliteration - for callers (like the westDigits override) that
+       insert a literal character directly, bypassing pattern matching, but
+       still want later context-gated rules to see it as having been typed. */
+    noteContext(ch){ this.ctx = boundContext(lay, this.ctx, ch); },
     backspace(){ return false; },
     pendingPreview(){ return ''; },
     flush(){ return ''; }
@@ -565,7 +577,15 @@ function attachTypingSurface(el, kbContainer, opts){
     e.preventDefault();
 
     if(westDigits && DIGIT_ASCII[code] !== undefined){
-      buffer += engine.flush() + DIGIT_ASCII[code];
+      /* match what the rendered keycap promises (buildKeyEl uses the same
+         US_SHIFT-or-digit choice). Insert the literal digit directly rather
+         than through engine.processChar - some layouts (e.g. transliteration)
+         have their own ASCII-digit -> Kannada-digit rule, which would defeat
+         the point of this override - but still tell an ime engine a character
+         was typed so its context window doesn't fall out of sync. */
+      const digitCh = e.shiftKey ? (US_SHIFT[code] || DIGIT_ASCII[code]) : DIGIT_ASCII[code];
+      if(engine.type === 'ime') engine.noteContext(digitCh);
+      buffer += engine.flush() + digitCh;
       flashAll(code, e.shiftKey);
       render();
       return;
@@ -601,9 +621,12 @@ function attachTypingSurface(el, kbContainer, opts){
 /* ============================================================
    Layout switching
    ============================================================ */
+let layoutLoadToken = 0;
 function setLayout(id){
   SEL = id;
+  const token = ++layoutLoadToken;
   loadLayout(id).then(l=>{
+    if(token !== layoutLoadToken) return; /* a newer setLayout() call already superseded this one */
     LAYOUT = l;
     refreshCoverage();
     try{ localStorage.setItem('typingKannadaLayout', id); }catch(e){}
@@ -696,21 +719,14 @@ document.getElementById('shiftToggle').addEventListener('click', function(){
     });
   });
 });
+/* Only ever called right after renderKeyboard() has just rebuilt kbLayout/
+   kbPractice from scratch (in syncLayoutUI, on layout switch) - those fresh
+   elements are already unswapped, so there is nothing left to undo in the
+   DOM here; this just clears the flag and the toggle button's visual state. */
 function resetShiftToggle(){
   if(!shiftToggled) return;
   shiftToggled = false;
-  const btn = document.getElementById('shiftToggle');
-  btn.classList.remove('on');
-  [kbLayout, kbPractice].forEach(kb=>{
-    kb.querySelectorAll('.key').forEach(k=>{
-      k.classList.remove('shifted');
-      const main = k.querySelector('.main');
-      const top = k.querySelector('.top');
-      if(main && top){
-        const tmp = main.textContent; main.textContent = top.textContent; top.textContent = tmp;
-      }
-    });
-  });
+  document.getElementById('shiftToggle').classList.remove('on');
 }
 
 /* Layout picker */
@@ -846,26 +862,12 @@ function hintKeyLabel(code, shift){
   return shift ? '⇧+' + base.toUpperCase() : base;
 }
 
-function hintSimulate(seq){
-  const eng = createEngine();
-  let buffer = '';
-  for(const step of seq){
-    if(eng.type === 'ime'){
-      const ch = charFromCode(step.code, step.shift);
-      if(ch === undefined) return null;
-      buffer = eng.processChar(buffer, ch, false, step.shift);
-    }else{
-      const emitted = eng.press(step.code, step.shift);
-      if(emitted === undefined) return null;
-      buffer += emitted.replace(/\r/g, '\n');
-    }
-  }
-  return buffer;
-}
-
-/* like hintSimulate but also captures the engine's hidden state, which is
-   what the next keystroke's behaviour depends on: for IMEs the context tail,
-   for keymaps the pending action-state / dead-key sequence. */
+/* Replays `seq` from scratch to establish a starting engine state - O(depth),
+   but only ever called once per hintExtend() call (for the already-committed
+   prefix), not per BFS candidate; see hintStep() for the O(1) per-candidate
+   extension used inside the search itself. Captures the engine's hidden
+   state, which is what the next keystroke's behaviour depends on: for IMEs
+   the context tail, for keymaps the pending action-state / dead-key sequence. */
 function hintEngineState(seq){
   const eng = createEngine();
   let buffer = '';
@@ -880,8 +882,31 @@ function hintEngineState(seq){
       buffer += emitted.replace(/\r/g, '\n');
     }
   }
-  if(eng.type === 'ime') return { seq, buf: buffer, ctx: eng.ctx };
-  return { seq, buf: buffer, st: eng.state, sq: eng.seq };
+  return packHintState(seq, buffer, eng);
+}
+
+function packHintState(seq, buf, eng){
+  if(eng.type === 'ime') return { seq, buf, eng, ctx: eng.ctx };
+  return { seq, buf, eng, st: eng.state, sq: eng.seq };
+}
+
+/* Extends a frontier state `s` by one key, in O(1): clones s's engine (a
+   cheap shallow copy - its mutable fields are primitives, its methods only
+   close over the shared, read-only layout) instead of replaying the whole
+   sequence from scratch the way hintEngineState() does. */
+function hintStep(s, k){
+  const eng = { ...s.eng };
+  let buf;
+  if(eng.type === 'ime'){
+    const ch = charFromCode(k.code, k.shift);
+    if(ch === undefined) return null;
+    buf = eng.processChar(s.buf, ch, false, k.shift);
+  }else{
+    const emitted = eng.press(k.code, k.shift);
+    if(emitted === undefined) return null;
+    buf = s.buf + emitted.replace(/\r/g, '\n');
+  }
+  return packHintState(s.seq.concat([k]), buf, eng);
 }
 
 /* A partial commit may keep growing toward `goal` only if it already looks
@@ -904,13 +929,58 @@ function imeAsciiPrefixes(){
   return imePrefixSet;
 }
 
-/* IMEs build aspirates/conjuncts by substitution (ಟ್+h → ಠ್, ಶ್+h → ಷ್), so
-   the committed text at mid-step need not be a literal prefix of the goal.
-   Normalising consonants to their unaspirated base keeps those states alive. */
-const IME_SKEL = { 'ಖ':'ಕ','ಘ':'ಗ','ಙ':'ಕ','ಛ':'ಚ','ಝ':'ಜ','ಞ':'ಚ','ಠ':'ಟ','ಢ':'ಡ','ಣ':'ಟ','ಥ':'ತ','ಧ':'ದ','ಭ':'ಬ','ಶ':'ಸ','ಷ':'ಸ','ೞ':'ಳ','ಱ':'ರ' };
+/* IMEs build aspirates/conjuncts/vocalic letters by substitution (ಟ್+h → ಠ್,
+   ಋ+R → ೠ, ...), so the committed text at mid-step need not be a literal
+   prefix of the goal. Rather than a hand-maintained table of just the
+   aspirate pairs, derive the same kind of "composed char -> what it was
+   built from" reduction straight from the layout's own patterns: any plain
+   (non-regex, non-context-gated-away) rule whose input is a Kannada prefix
+   plus exactly one more literal key, and whose output is a different fixed
+   string, reduces that output back to the prefix. hintSkel below applies this
+   map one codepoint at a time, so both sides are reduced to a single bare
+   codepoint (stripping a trailing virama, e.g. 'ಷ್' -> 'ಷ') before being
+   recorded - a multi-codepoint key would never match that per-character walk,
+   and a bare consonant (with no virama of its own) is exactly what shows up
+   once a following vowel merges into a mid-composition consonant+virama. */
+const LITERAL_RULE_RE = /^(?:\\.|[^\\^$.*+?()[\]{}|])+$/;
+function reduceCluster(s){
+  return (s.length >= 2 && s.charCodeAt(s.length - 1) === 0x0CCD) ? s.slice(0, -1) : s;
+}
+const SKEL_CACHE = new WeakMap();
+function buildSkelMap(layout){
+  let map = SKEL_CACHE.get(layout);
+  if(map) return map;
+  map = {};
+  for(const grp of [layout.patterns || [], layout.patterns_shift || [], layout.patterns_x || []]){
+    for(const rule of grp){
+      const src = String(rule[0]);
+      if(!LITERAL_RULE_RE.test(src)) continue; // skip anything with real regex syntax
+      const inp = src.replace(/\\(.)/g, '$1');
+      if(inp.length < 2) continue;
+      const prefix = inp.slice(0, -1);
+      if(!KANNADA_RE.test(prefix)) continue; // only prefixes reachable mid-composition matter here
+      const out = rule[rule.length - 1];
+      if(typeof out !== 'string' || out.indexOf('$') !== -1) continue;
+      const outKey = reduceCluster(out);
+      const prefixVal = reduceCluster(prefix);
+      if(outKey.length !== 1 || prefixVal.length !== 1 || outKey === prefixVal) continue;
+      if(!(outKey in map)) map[outKey] = prefixVal;
+    }
+  }
+  SKEL_CACHE.set(layout, map);
+  return map;
+}
 function hintSkel(s){
+  const map = buildSkelMap(LAYOUT);
   let out = '';
-  for(const c of s) out += IME_SKEL[c] || c;
+  for(const c of s){
+    /* follow chained reductions to their root (e.g. ಷ -> ಶ -> ಸ) so a goal
+       and a mid-composition buffer that are different numbers of hops apart
+       still reduce to the same canonical base character. */
+    let r = c, hops = 0;
+    while(map[r] !== undefined && hops++ < 4) r = map[r];
+    out += r;
+  }
   return out;
 }
 
@@ -948,10 +1018,9 @@ function hintExtend(prev, goal, seq, maxDepth){
     let overflow = false;
     for(const s of frontier){
       for(const k of HINT_KEYS){
-        const cand = s.seq.concat([k]);
-        const st = hintEngineState(cand);
+        const st = hintStep(s, k);
         if(st === null) continue;
-        if(st.buf === goal) return cand;
+        if(st.buf === goal) return st.seq;
         if(!hintCompat(st.buf, goal)) continue;
         const dk = (st.st !== undefined)
           ? st.buf + '\u0001' + st.st + '\u0001' + st.sq
