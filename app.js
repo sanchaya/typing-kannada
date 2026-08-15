@@ -105,6 +105,28 @@ function charFromCode(code, shift){
   return US_SHIFT[code] || base.toUpperCase();
 }
 
+/* iOS soft keyboards report KeyboardEvent.code as 'Unidentified' (with
+   keyCode 0), so the engines cannot rely on e.code alone there: map the
+   character iOS put in e.key back to the ANSI virtual keycode + shift the
+   rest of the app expects. Built from the same QWERTY_LABEL/US_SHIFT tables
+   that drive charFromCode(), so the two stay in lockstep. */
+const KEY_TO_CODE = (() => {
+  const map = {};
+  for(const [code, ch] of Object.entries(QWERTY_LABEL)){
+    const low = ch.toLowerCase();
+    map[low] = { code:+code, shift:false };
+    if(low !== ch) map[ch] = { code:+code, shift:true }; /* only letters get a shift twin */
+  }
+  for(const [code, ch] of Object.entries(US_SHIFT)) map[ch] = { code:+code, shift:true };
+  map[' '] = { code:49, shift:false };
+  map['Enter'] = { code:36, shift:false };
+  map['\n'] = { code:36, shift:false };
+  map['\r'] = { code:36, shift:false };
+  map['Tab'] = { code:48, shift:false };
+  map['Backspace'] = { code:51, shift:false };
+  return map;
+})();
+
 /* Every assigned codepoint in the Kannada block (U+0C80–U+0CFF), the master
    reference list. Reachability per layout is computed dynamically by
    buildCoverage() - the app never hardcodes which letters a layout types. */
@@ -548,7 +570,7 @@ function attachTypingSurface(el, kbContainer, opts){
   function render(){
     const preview = engine.pendingPreview();
     if(buffer === '' && preview === ''){
-      el.innerHTML = opts.placeholder ? `<span class="placeholder">${opts.placeholder}</span>` : '';
+      el.innerHTML = opts.placeholder ? `<span class="placeholder" contenteditable="false">${opts.placeholder}</span>` : '';
     } else {
       el.innerHTML = escapeHtml(buffer) +
         (preview ? `<span class="pending">${escapeHtml(preview)}</span>` : '') +
@@ -559,11 +581,18 @@ function attachTypingSurface(el, kbContainer, opts){
 
   el.addEventListener('click', ()=> el.focus());
 
+  /* The surface is contenteditable so iOS/Android summon the soft keyboard,
+     but the app owns the buffer entirely (it re-renders innerHTML on every
+     keystroke). Block native insertion so the two can never diverge - keydown
+     already preventDefaults the mapped keys; this catches the paths where the
+     browser would otherwise commit text (beforeinput/insertCompositionText). */
+  el.addEventListener('beforeinput', (e)=> e.preventDefault());
+
   function handleKey(e){
     if(e.ctrlKey || e.metaKey) return;
     if(e.key === 'Tab' || e.key === 'Escape') return; // let browser handle focus/escape
 
-    if(e.code === 'Backspace'){
+    if(e.code === 'Backspace' || e.key === 'Backspace'){
       e.preventDefault();
       const cancelledPending = engine.backspace();
       if(!cancelledPending) buffer = popGrapheme(buffer);
@@ -572,7 +601,14 @@ function attachTypingSurface(el, kbContainer, opts){
       return;
     }
 
-    const code = CODE_MAP[e.code];
+    let code = CODE_MAP[e.code];
+    let shift = e.shiftKey;
+    if(code === undefined && e.key){
+      /* Mobile soft keyboards (notably iOS) report code === 'Unidentified' -
+         fall back to the character in e.key and derive the keycode from it. */
+      const m = KEY_TO_CODE[e.key];
+      if(m){ code = m.code; shift = m.shift; }
+    }
     if(code === undefined) return; // arrows etc. – let browser handle
     e.preventDefault();
 
@@ -583,20 +619,19 @@ function attachTypingSurface(el, kbContainer, opts){
          have their own ASCII-digit -> Kannada-digit rule, which would defeat
          the point of this override - but still tell an ime engine a character
          was typed so its context window doesn't fall out of sync. */
-      const digitCh = e.shiftKey ? (US_SHIFT[code] || DIGIT_ASCII[code]) : DIGIT_ASCII[code];
+      const digitCh = shift ? (US_SHIFT[code] || DIGIT_ASCII[code]) : DIGIT_ASCII[code];
       if(engine.type === 'ime') engine.noteContext(digitCh);
       buffer += engine.flush() + digitCh;
-      flashAll(code, e.shiftKey);
+      flashAll(code, shift);
       render();
       return;
     }
 
     if(engine.type === 'ime'){
-      const ch = charFromCode(code, e.shiftKey);
-      if(ch !== undefined) buffer = engine.processChar(buffer, ch, e.altKey, e.shiftKey);
-      flashAll(code, e.shiftKey);
+      const ch = charFromCode(code, shift);
+      if(ch !== undefined) buffer = engine.processChar(buffer, ch, e.altKey, shift);
+      flashAll(code, shift);
     }else{
-      const shift = e.shiftKey;
       const emitted = engine.press(code, shift);
       if(emitted) buffer += emitted.replace(/\r/g, '\n');
       flashAll(code, shift);
