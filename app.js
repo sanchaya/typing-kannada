@@ -581,37 +581,19 @@ function attachTypingSurface(el, kbContainer, opts){
 
   el.addEventListener('click', ()=> el.focus());
 
-  /* The surface is contenteditable so iOS/Android summon the soft keyboard,
-     but the app owns the buffer entirely (it re-renders innerHTML on every
-     keystroke). Block native insertion so the two can never diverge - keydown
-     already preventDefaults the mapped keys; this catches the paths where the
-     browser would otherwise commit text (beforeinput/insertCompositionText). */
-  el.addEventListener('beforeinput', (e)=> e.preventDefault());
+  function doBackspace(){
+    const cancelledPending = engine.backspace();
+    if(!cancelledPending) buffer = popGrapheme(buffer);
+    flashAll(51, false);
+    render();
+  }
 
-  function handleKey(e){
-    if(e.ctrlKey || e.metaKey) return;
-    if(e.key === 'Tab' || e.key === 'Escape') return; // let browser handle focus/escape
-
-    if(e.code === 'Backspace' || e.key === 'Backspace'){
-      e.preventDefault();
-      const cancelledPending = engine.backspace();
-      if(!cancelledPending) buffer = popGrapheme(buffer);
-      flashAll(51, false);
-      render();
-      return;
-    }
-
-    let code = CODE_MAP[e.code];
-    let shift = e.shiftKey;
-    if(code === undefined && e.key){
-      /* Mobile soft keyboards (notably iOS) report code === 'Unidentified' -
-         fall back to the character in e.key and derive the keycode from it. */
-      const m = KEY_TO_CODE[e.key];
-      if(m){ code = m.code; shift = m.shift; }
-    }
-    if(code === undefined) return; // arrows etc. – let browser handle
-    e.preventDefault();
-
+  /* One physical/virtual keystroke, already resolved to an ANSI code + shift
+     state, run through the current engine. Shared by the keydown path (which
+     resolves code/shift from e.code, or from e.key via KEY_TO_CODE when a
+     mobile keyboard reports code as 'Unidentified') and the beforeinput
+     fallback path below (which resolves it from e.data via the same map). */
+  function processKey(code, shift, altKey){
     if(westDigits && DIGIT_ASCII[code] !== undefined){
       /* match what the rendered keycap promises (buildKeyEl uses the same
          US_SHIFT-or-digit choice). Insert the literal digit directly rather
@@ -629,7 +611,7 @@ function attachTypingSurface(el, kbContainer, opts){
 
     if(engine.type === 'ime'){
       const ch = charFromCode(code, shift);
-      if(ch !== undefined) buffer = engine.processChar(buffer, ch, e.altKey, shift);
+      if(ch !== undefined) buffer = engine.processChar(buffer, ch, altKey, shift);
       flashAll(code, shift);
     }else{
       const emitted = engine.press(code, shift);
@@ -637,6 +619,50 @@ function attachTypingSurface(el, kbContainer, opts){
       flashAll(code, shift);
     }
     render();
+  }
+
+  /* keydown (below) is the primary path and covers desktop plus a plain tap
+     on iOS's soft keyboard. It is unreliable on Android (Gboard, Samsung
+     Keyboard, etc. commonly fire no usable keydown for regular typing) and
+     on any keyboard once autocorrect/predictive-text substitutes a word -
+     both instead surface only as beforeinput/input, carrying the actual
+     text in e.data. A prevented keydown suppresses the beforeinput for that
+     same keystroke in compliant browsers, so this only ever fires for
+     keystrokes keydown didn't already handle - it is a fallback, not a
+     duplicate path. The surface is contenteditable purely so iOS/Android
+     summon the soft keyboard at all; native insertion is always blocked
+     here so the DOM can never diverge from the buffer this app owns. */
+  el.addEventListener('beforeinput', (e)=>{
+    e.preventDefault();
+    if(e.inputType === 'deleteContentBackward'){ doBackspace(); return; }
+    if(!e.data) return; // formatting commands, paste, etc. - nothing to type
+    for(const ch of e.data){
+      const m = KEY_TO_CODE[ch];
+      if(m) processKey(m.code, m.shift, false);
+    }
+  });
+
+  function handleKey(e){
+    if(e.ctrlKey || e.metaKey) return;
+    if(e.key === 'Tab' || e.key === 'Escape') return; // let browser handle focus/escape
+
+    if(e.code === 'Backspace' || e.key === 'Backspace'){
+      e.preventDefault();
+      doBackspace();
+      return;
+    }
+
+    let code = CODE_MAP[e.code];
+    let shift = e.shiftKey;
+    if(code === undefined && e.key){
+      /* Mobile soft keyboards (notably iOS) report code === 'Unidentified' -
+         fall back to the character in e.key and derive the keycode from it. */
+      const m = KEY_TO_CODE[e.key];
+      if(m){ code = m.code; shift = m.shift; }
+    }
+    if(code === undefined) return; // arrows etc. – let browser handle
+    e.preventDefault();
+    processKey(code, shift, e.altKey);
   }
 
   el.addEventListener('keydown', handleKey);
