@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BLF 2026 Speaker Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,800&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Concept: one screen per view. A bookshop counter: white paper, ink type, saffron accent. Every tab fits the viewport and pages instead of scrolling. */
+:root{--bg:#fff;--surface:#f6f5f2;--fg:#1b1d22;--muted:#5d626d;--line:#e4e2dc;--accent:#c2410c;--accent-fg:#fff;--tint:#fdeee5;--ok:#166534;--f:#7c3aed;--m:#0e7490;--u:#c9c7c0;
+--display:"Fraunces",Georgia,serif;--body:"Inter",system-ui,sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden;background:#fff}
+body{background:var(--bg);color:var(--fg);font:14px/1.4 var(--body);padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px))}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{height:100%;max-width:1000px;margin:0 auto;display:flex;flex-direction:column;min-height:0}
+.tabs{flex:0 0 auto;display:flex;gap:0;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tab{background:none;border:0;border-bottom:3px solid transparent;padding:9px 11px;color:var(--muted);cursor:pointer;font-weight:600;white-space:nowrap;font-size:13px}
+.tab[aria-selected=true]{color:var(--fg);border-bottom-color:var(--accent)}
+.view{flex:1;min-height:0;display:flex;flex-direction:column}
+.view[hidden]{display:none}
+.top{flex:0 0 auto;padding:8px 0 4px}
+h1{font:800 clamp(1.25rem,4.2vw,2rem)/1.05 var(--display);margin:0 0 4px;letter-spacing:-.01em}
+h2{font:700 1.1rem/1.15 var(--display);margin:0}
+.kicker{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600;margin:0 0 3px}
+.sub{color:var(--muted);margin:0;font-size:13px}
+.seg,.asks,.fchips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:6px 0 2px;flex:0 0 auto}
+.seg::-webkit-scrollbar,.asks::-webkit-scrollbar,.fchips::-webkit-scrollbar,.tabs::-webkit-scrollbar{display:none}
+.pill{flex:0 0 auto;white-space:nowrap;background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12.5px;cursor:pointer}
+.pill[aria-pressed=true]{background:var(--fg);color:#fff;border-color:var(--fg)}
+.ask{background:var(--tint);color:var(--accent);border-color:transparent;font-weight:600}
+.body{flex:1;min-height:0;position:relative;overflow:hidden}
+.pager{flex:0 0 auto;min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0 max(8px,env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.pbtn{background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 14px;font-weight:600;cursor:pointer;color:var(--fg)}
+.pbtn[disabled]{opacity:.35;cursor:default}
+.dots{display:flex;gap:5px;align-items:center}.dots i{width:7px;height:7px;border-radius:50%;background:var(--line);display:block}.dots i.on{background:var(--accent)}
+/* dashboard */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex:0 0 auto;padding:4px 0 8px}
+.kpi{background:var(--surface);border:0;border-radius:10px;padding:8px 8px;text-align:left;cursor:pointer;min-width:0}
+.kpi b{display:block;font:800 clamp(1.25rem,3.4vh,1.9rem)/1 var(--display);color:var(--accent)}
+.kpi span{font-size:10.5px;color:var(--muted);line-height:1.2;display:block;margin-top:3px}
+.mini{display:grid;grid-template-columns:1.2fr 1fr;gap:8px;flex:0 0 auto}
+.panel{background:var(--surface);border-radius:10px;padding:8px;min-width:0;cursor:pointer}
+.panel h5{margin:0 0 4px;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.mini .map{max-height:clamp(56px,16vh,150px);background:transparent;margin:0 auto}
+.mini .map text{display:none}
+.mini .vc{height:clamp(56px,16vh,150px);padding-top:0;gap:3px;max-width:none}
+.mini .vc .v{display:none}.mini .vc .y{font-size:9px;margin-top:2px}
+.hb{display:grid;gap:6px;margin-top:8px}
+.hb .gr{grid-template-columns:74px 1fr;font-size:11px}.hb .gr .tr{height:18px}
+.hb .gr .tr b{font-size:10px}
+/* cards grid (discover) */
+.grid{height:100%;display:grid;gap:10px 10px;align-content:start;padding-top:6px}
+.card{background:none;border:0;text-align:left;cursor:pointer;padding:0;min-width:0}
+.card img,.card .ph{width:96px;height:96px;max-width:100%;border-radius:8px;object-fit:cover;object-position:center 22%;display:block;background:var(--surface)}
+.card .nm{font:700 .92rem/1.15 var(--display);margin:5px 0 1px}
+.card .ln{font-size:11.5px;color:var(--muted);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ph{display:flex;align-items:center;justify-content:center;background:var(--tint);color:var(--accent);font:800 1.2rem var(--display)}
+/* rows */
+.rows{height:100%;display:flex;flex-direction:column}
+.row{flex:0 0 auto;height:var(--rh,60px);display:grid;grid-template-columns:auto 44px 1fr auto;gap:10px;align-items:center;border-bottom:1px solid var(--line);min-width:0}
+.row .no{font:800 1.2rem var(--display);color:var(--accent);min-width:1.6ch;text-align:right;font-variant-numeric:tabular-nums}
+.row.nonum{grid-template-columns:44px 1fr auto}
+.row .th,.row .ph{width:44px;height:44px;border-radius:7px;object-fit:cover;object-position:center 22%;cursor:pointer}
+.row .mid{min-width:0;cursor:pointer;background:none;border:0;text-align:left;padding:0}
+.row .nm{font:700 .98rem/1.2 var(--display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.row .sl{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.row .sl b{color:var(--accent);font-weight:600}
+.star{background:none;border:0;font-size:21px;line-height:1;color:var(--muted);cursor:pointer;padding:6px;border-radius:6px}
+.star[aria-pressed=true]{color:var(--accent)}
+.empty{padding:22px 0;color:var(--muted)}
+/* search & filters */
+.srow{display:flex;gap:8px;flex:0 0 auto;padding-top:8px}
+input[type=search],select{font:inherit;color:var(--fg);background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 11px;min-width:0}
+input[type=search]{flex:1 1 0}
+.fbtn{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 13px;font-weight:600;cursor:pointer}
+.fbtn b{background:var(--accent);color:#fff;border-radius:999px;padding:0 7px;font-size:11.5px;margin-left:6px}
+.meta{font-size:12px;color:var(--muted);flex:0 0 auto;padding:4px 0}
+.x{flex:0 0 auto;background:var(--tint);color:var(--accent);border:0;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
+.drawer{position:fixed;left:0;right:0;bottom:0;max-height:88%;overflow:auto;background:#fff;border-radius:16px 16px 0 0;z-index:41;padding:14px max(14px,env(safe-area-inset-left,0px)) calc(16px + env(safe-area-inset-bottom,0px));display:none;box-shadow:0 -8px 30px rgba(0,0,0,.18)}
+.drawer.open{display:block}
+@media (min-width:720px){.drawer{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);width:560px;border-radius:16px}}
+.pg{margin-bottom:10px}.pg h4{margin:0 0 5px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.veil{position:fixed;inset:0;background:rgba(20,20,25,.45);z-index:40;display:none}.veil.open{display:block}
+/* sheet */
+.sheet{position:fixed;left:0;right:0;bottom:0;max-height:92%;overflow:auto;background:#fff;border-radius:16px 16px 0 0;z-index:41;padding:14px max(14px,env(safe-area-inset-left,0px)) calc(14px + env(safe-area-inset-bottom,0px));display:none}
+.sheet.open{display:block}
+@media (min-width:720px){.sheet{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);width:640px;border-radius:16px}}
+.sh-top{display:grid;grid-template-columns:84px 1fr;gap:12px;align-items:start;padding-right:34px}
+.sh-top img,.sh-top .ph{width:84px;height:84px;border-radius:10px;object-fit:cover;object-position:center 22%}
+.sh-top h3{font:800 1.3rem/1.1 var(--display);margin:0}
+.close{position:absolute;top:8px;right:10px;background:var(--surface);border:0;border-radius:999px;width:32px;height:32px;font-size:17px;cursor:pointer}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.tag{font-size:11.5px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 6px}
+.tag.new{background:var(--tint);color:var(--accent);border-color:var(--accent);font-weight:600}
+.tag.ret{color:var(--ok);border-color:var(--ok)}.tag.rk{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+.tag.lg{color:#0e7490;border-color:#0e7490}.tag.role{color:var(--fg);border-color:var(--fg)}.tag.nonauth{background:var(--surface);color:var(--fg);border-color:var(--fg);font-weight:600}
+.stabs{display:flex;gap:4px;margin:10px 0 8px;border-bottom:1px solid var(--line)}
+.stab{background:none;border:0;border-bottom:3px solid transparent;padding:6px 10px;font-weight:600;color:var(--muted);cursor:pointer}
+.stab[aria-selected=true]{color:var(--fg);border-bottom-color:var(--accent)}
+.sh-body{font-size:13px;max-height:52vh;overflow:auto}.sh-body .fa{font-size:12px;color:var(--muted);margin:0 0 3px}.sh-body .fa b{color:var(--fg);margin-right:4px}
+.sh-body p{margin:0 0 8px}.sh-body h4{margin:8px 0 3px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.tl{display:flex;gap:3px;align-items:center;margin-top:6px}.tl i{width:8px;height:8px;border-radius:50%;background:var(--line);display:block}.tl i.on{background:var(--fg)}.tl i.now{background:var(--accent)}.tl span{font-size:11px;color:var(--muted);margin-left:6px}
+.tlv{list-style:none;margin:2px 0 0;padding:0 0 0 16px;border-left:2px solid var(--line)}.tlv li{position:relative;padding:0 0 6px;font-size:13px}.tlv li::before{content:"";position:absolute;left:-21px;top:5px;width:9px;height:9px;border-radius:50%;background:var(--fg)}.tlv li.now::before{background:var(--accent)}.tlv b{margin-right:6px}
+.bl{display:flex;gap:10px;flex-wrap:wrap}.bl>div{width:64px;font-size:10.5px;color:var(--muted);line-height:1.2}
+.bk{flex:0 0 auto;width:40px;height:56px;border-radius:2px 4px 4px 2px;overflow:hidden;box-shadow:inset 3px 0 0 rgba(0,0,0,.25);display:flex;align-items:flex-end;padding:3px 2px 3px 6px;color:#fff;font:600 7.5px/1.1 var(--display);overflow-wrap:anywhere}
+.bk.has{padding:0}.bk.has img{width:100%;height:100%;object-fit:cover;display:block}
+.bl .bk{width:62px;height:88px;font-size:9.5px}
+.sh-act{display:flex;gap:8px;margin-top:10px}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:9px 14px;font-weight:600;cursor:pointer}.btn.ghost{background:var(--surface);color:var(--fg);text-decoration:none}
+/* study slides */
+.slide{height:100%;display:flex;flex-direction:column;justify-content:center;overflow:auto;padding:4px 0}
+.big{font:800 clamp(2.4rem,9vh,4.6rem)/.95 var(--display);color:var(--accent);margin:0}
+.slide h2{font-size:clamp(1.05rem,2.6vh,1.5rem);margin:4px 0 2px}
+.slide p.t{color:var(--muted);margin:2px 0 8px;font-size:clamp(12px,1.9vh,14px);max-width:62ch}
+.waffle{display:grid;grid-template-columns:repeat(25,1fr);gap:2px;max-width:520px}.waffle i{aspect-ratio:1;border-radius:2px;display:block;background:var(--fg)}.waffle i.n{background:var(--accent)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}.legend button{background:none;border:0;cursor:pointer;color:var(--muted);padding:0;font-size:12px}.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.gb{display:grid;gap:7px;max-width:560px}.gr{display:grid;grid-template-columns:84px 1fr;gap:8px;align-items:center;font-size:12px}.gr .tr{display:flex;height:24px;border-radius:5px;overflow:hidden;background:var(--surface)}.gr .tr b{display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600;min-width:0;overflow:hidden}
+.vc{display:flex;gap:6px;align-items:flex-end;height:clamp(110px,24vh,210px);max-width:560px;padding-top:16px}.vc>div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;min-width:0}.vc .col{width:100%;display:flex;flex-direction:column;justify-content:flex-end}.vc .col b{display:block;width:100%}.vc .v{font-size:10.5px;color:var(--muted);margin-bottom:2px}.vc .y{font-size:10.5px;color:var(--muted);margin-top:4px}.vc .y.now{color:var(--accent);font-weight:700}
+.bubbles{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.bub{border:0;border-radius:50%;background:#0e7490;color:#fff;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;line-height:1.05;padding:2px;text-align:center}.bub small{font-weight:400;opacity:.85}
+.map{width:100%;height:auto;max-height:34vh;display:block;background:#f3f6f9;border-radius:10px}
+.map .land{fill:#dfe4ea;stroke:#c9d0d8;stroke-width:.6}.map .grat{stroke:#e6ebf0;stroke-width:.5;fill:none}.map circle.b{fill:var(--accent);fill-opacity:.78;stroke:#fff;stroke-width:1.2;cursor:pointer}.map circle.b.o{fill:#0e7490}.map text{font:600 10px var(--body);fill:#1b1d22;pointer-events:none}
+.mapwrap{max-width:560px}.cch{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+table{border-collapse:collapse;width:100%;font-size:12px}th,td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:500}
+.grid9{display:grid;grid-template-columns:repeat(9,1fr);gap:2px;width:120px}.grid9 i{height:9px;border-radius:2px;background:var(--line);display:block}.grid9 i.on{background:var(--fg)}.grid9 i.now{background:var(--accent)}
+.status{font-size:11.5px;font-weight:600;color:var(--accent)}
+.note{font-size:11px;color:var(--muted);margin-top:6px}
+@media (max-width:520px){.sh-body{max-height:50vh}}
+@media (max-height:700px){#v-discover .top .sub,.hb{display:none}}
+@media (prefers-reduced-motion:no-preference){.pill,.pbtn{transition:background .12s}}
+/* denser data slides */
+.slide{justify-content:flex-start;gap:0}
+.hd{display:flex;gap:12px;align-items:center}
+.hd .big{font-size:clamp(2.2rem,8vh,3.8rem);flex:0 0 auto}
+.hd h2{margin:0}.hd p.t{margin:2px 0 0}
+.sec{margin-top:10px}
+.sec h5{margin:0 0 4px;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.hbar{display:grid;grid-template-columns:96px 1fr 34px;gap:6px;align-items:center;font-size:12px;background:none;border:0;padding:1px 0;text-align:left;cursor:pointer;width:100%}
+.hbar .tr{height:11px;background:var(--surface);border-radius:3px;overflow:hidden}.hbar .tr b{display:block;height:100%}
+.hbar span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hbar span:last-child{text-align:right;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.tile{background:var(--surface);border-radius:8px;padding:6px 8px;min-width:0}.tile b{display:block;font:700 1.1rem/1.1 var(--display)}.tile span{font-size:10.5px;color:var(--muted);line-height:1.2;display:block}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+@media (max-width:640px){.two{grid-template-columns:1fr}}
+.vc .y2{font-size:9px;color:var(--accent);margin-top:1px}
+@media (max-height:700px){.opt{display:none}}
+.v6{height:clamp(90px,19vh,170px)}
+@media (min-width:900px){.slide .vc{height:clamp(140px,34vh,300px)}.v6{height:clamp(140px,34vh,300px)}.tile b{font-size:1.6rem}.tile span{font-size:12px}.hbar{font-size:13px;grid-template-columns:120px 1fr 40px}.hbar .tr{height:14px}.tile{padding:10px 12px}.sec{margin-top:16px}.tiles{margin-top:16px}}
+</style>
+<div class="app">
+<nav class="tabs" role="tablist"><button class="tab" role="tab" data-v="discover">Discover</button><button class="tab" role="tab" data-v="hear">Who to hear</button><button class="tab" role="tab" data-v="speakers">All speakers</button><button class="tab" role="tab" data-v="study">The data</button><button class="tab" role="tab" data-v="tracker">Tracker</button></nav>
+
+<section class="view" id="v-discover">
+ <div class="top"><p class="kicker">11–13 Dec 2026 · Freedom Park, Bengaluru</p><h1>Bangalore Literature Festival 2026</h1><p class="sub" id="herosub"></p></div>
+ <div id="dash"></div>
+ <div class="seg" id="seg"></div>
+ <div class="body" id="dbody"></div>
+ <div class="pager" id="dpager"></div>
+</section>
+
+<section class="view" id="v-hear" hidden>
+ <div class="top"><h2>Who to listen to</h2><p class="sub">Top names in each theme, in priority order. Tap anyone for books and BLF history.</p></div>
+ <div class="body" id="hbody"></div>
+ <div class="pager" id="hpager"></div>
+</section>
+
+<section class="view" id="v-speakers" hidden>
+ <div class="srow"><input type="search" id="q" placeholder="Search name, book or topic" aria-label="Search speakers"><button class="fbtn" id="fbtn">Filters<b id="fcount" hidden></b></button></div>
+ <div class="fchips" id="fchips"></div>
+ <div class="meta" id="count"></div>
+ <div class="body" id="sbody"></div>
+ <div class="pager" id="spager"></div>
+</section>
+
+<section class="view" id="v-study" hidden>
+ <div class="body" id="ybody"></div>
+ <div class="pager" id="ypager"></div>
+</section>
+
+<section class="view" id="v-tracker" hidden>
+ <div class="top"><h2>Track authors across editions</h2><p class="sub">Presence 2018 to 2026 (orange is 2026). Star speakers anywhere, or add here.</p></div>
+ <div class="srow"><input type="search" id="tq" placeholder="Add a speaker by name" aria-label="Add speaker"><button class="btn" id="tadd">Add</button></div>
+ <div class="fchips" id="tpresets"></div>
+ <div class="body" id="tbody"></div>
+ <div class="pager" id="tpager"></div>
+</section>
+</div>
+<div class="veil" id="veil"></div>
+<div class="drawer" id="drawer" role="dialog" aria-label="Filters"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Speaker details"></div>
+<script>
+(function(){
+var S=[],ST=null,YRS=[2018,2019,2020,2021,2022,2023,2024,2025,2026],VIEWS=['discover','hear','speakers','study','tracker'];
+var st={q:'',city:'',cc:'Any',na:false,theme:'All',lang:'Any',g:'',picks:false,nw:false,ret:false,reg:false,books:false,sort:'rank',view:'discover'};
+var pg={d:0,h:0,s:0,t:0,y:0},shelf='start',stars={},lastFocus=null,sTab='about',curSheet=-1;
+try{stars=JSON.parse(localStorage.getItem('blf26stars')||'{}')}catch(e){}
+function save(){try{localStorage.setItem('blf26stars',JSON.stringify(stars))}catch(e){}}
+var $=function(i){return document.getElementById(i)};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function ed(o){return o.y.filter(function(y){return y>=2018&&y<=2025})}
+var WHY={"Ramachandra Guha":"India's best-known public historian.","Peter Frankopan":"The Oxford historian behind The Silk Roads.","Cristina Rivera Garza":"Pulitzer Prize winner for memoir, 2024.","Vivek Shanbhag":"Kannada novelist of Ghachar Ghochar.","Devdutt Pattanaik":"Mythologist with 70+ books.","Geoff Dyer":"Essayist; new memoir, Homework.","Vishal Bhardwaj":"Director of Maqbool, Omkara, Haider.","Priyamvada Natarajan":"Yale astrophysicist mapping dark matter."};
+var START=Object.keys(WHY),PAL=['#7c2d12','#1e3a5f','#3f3f46','#14532d','#581c87','#831843','#155e75'];
+function tile(b){var h=0;for(var i=0;i<b.t.length;i++)h=(h*31+b.t.charCodeAt(i))>>>0;
+ return b.c?'<div class="bk has" title="'+esc(b.t)+'"><img loading="lazy" alt="'+esc(b.t)+'" src="'+esc(b.c)+'"></div>':'<div class="bk" style="background:'+PAL[h%PAL.length]+'" title="'+esc(b.t)+'">'+esc(b.t.length>30?b.t.slice(0,28)+'…':b.t)+'</div>'}
+function ini(n){var p=n.replace(/[^A-Za-z\u00C0-\u024F ]/g,'').trim().split(/\s+/);return (p[0]||'?').charAt(0)+(p.length>1?p[p.length-1].charAt(0):'')}
+function pic(o,c){return o.ph?'<img class="'+c+'" decoding="async" alt="" src="'+esc(o.ph)+'">':'<div class="ph '+c+'">'+esc(ini(o.n))+'</div>'}
+function hist(o){return o.first?'First time at BLF':'At BLF in '+o.y.length+' edition'+(o.y.length>1?'s':'')}
+function tl(o){var h='<div class="tl">';YRS.forEach(function(y){h+='<i class="'+(y===2026?'now':(o.y.indexOf(y)>-1?'on':''))+'"></i>'});return h+'<span>'+(o.first?'first time at BLF':ed(o).length+' since 2018')+'</span></div>'}
+function tags(o){return '<div class="tags"><span class="tag '+(o.nonauth?'nonauth':'role')+'">'+esc(o.role)+'</span>'+(o.first?'<span class="tag new">First-time</span>':'<span class="tag ret">'+hist(o)+'</span>')+(o.p?'<span class="tag rk">Pick #'+o.r+' in '+esc(o.t)+'</span>':'')+'<span class="tag">'+esc(o.cc==='Unknown'?'Country not stated':o.cc)+(o.dia?' (diaspora)':'')+'</span>'+o.lg.map(function(l){return '<span class="tag lg">'+esc(l)+'</span>'}).join('')+'</div>'}
+/* pager */
+function mkPager(el,key,total,per,extra){var n=Math.max(1,Math.ceil(total/per));if(pg[key]>=n)pg[key]=n-1;if(pg[key]<0)pg[key]=0;
+ el.innerHTML='<button class="pbtn" data-step="-1"'+(pg[key]<=0?' disabled':'')+'>‹ Prev</button><span>'+(extra||'')+'Page '+(pg[key]+1)+' of '+n+'</span><button class="pbtn" data-step="1"'+(pg[key]>=n-1?' disabled':'')+'>Next ›</button>'}
+function step(d){var v=st.view;
+ if(v==='study'){var n=slides().length;pg.y=Math.max(0,Math.min(n-1,pg.y+d));story();return}
+ var k={discover:'d',hear:'h',speakers:'s',tracker:'t'}[v];if(!k)return;pg[k]=Math.max(0,pg[k]+d);renderView()}
+document.addEventListener('click',function(e){var b=e.target.closest('[data-step]');if(b&&!b.disabled)step(+b.dataset.step)});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeSheet();closeDrawer();return}if(document.activeElement&&/INPUT|SELECT/.test(document.activeElement.tagName))return;if(e.key==='ArrowRight')step(1);if(e.key==='ArrowLeft')step(-1)});
+var tx=0,ty=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+document.addEventListener('touchend',function(e){if($('sheet').classList.contains('open')||$('drawer').classList.contains('open'))return;var dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(Math.abs(dx)>60&&Math.abs(dy)<45){if(e.target.closest&&e.target.closest('.seg,.asks,.fchips,.tabs'))return;step(dx<0?1:-1)}},{passive:true});
+var rt;window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(renderView,120)});
+/* views */
+function setView(v,keep){st.view=v;VIEWS.forEach(function(x){$('v-'+x).hidden=x!==v});document.querySelectorAll('.tab').forEach(function(t){t.setAttribute('aria-selected',t.dataset.v===v)});if(!keep){try{history.replaceState(null,'','#'+v)}catch(e){}}renderView()}
+function renderView(){if(!S.length)return;var v=st.view;if(v==='discover')discover();else if(v==='hear')ranked();else if(v==='speakers')render();else if(v==='study')story();else tracker()}
+document.querySelector('.tabs').addEventListener('click',function(e){var b=e.target.closest('.tab');if(b)setView(b.dataset.v)});
+function go(p){Object.keys(p).forEach(function(k){st[k]=p[k]});st.q='';$('q').value='';pg.s=0;setView('speakers')}
+function reset(){st.city='';st.cc='Any';st.na=false;st.theme='All';st.lang='Any';st.g='';st.picks=st.nw=st.ret=st.reg=st.books=false;pg.s=0}
+/* discover */
+var SH=[['start','Start here'],['new','New to BLF'],['reg','Back again'],['lang','Languages']];
+function shelfList(k){
+ if(k==='start')return START.map(function(n){return S.filter(function(o){return o.n===n})[0]}).filter(Boolean);
+ if(k==='new')return S.filter(function(o){return o.first}).sort(function(a,b){return (b.p?1:0)-(a.p?1:0)||(b.bk.length>0)-(a.bk.length>0)||a.n.localeCompare(b.n)});
+ if(k==='reg')return S.filter(function(o){return ed(o).length>=3}).sort(function(a,b){return ed(b).length-ed(a).length||a.n.localeCompare(b.n)});
+ return S.filter(function(o){return o.lg.length}).sort(function(a,b){return b.lg.length-a.lg.length||a.n.localeCompare(b.n)})}
+function discover(){
+ var n=S.length,F=S.filter(function(o){return o.first}),W=S.filter(function(o){return o.g==='f'}).length,M=S.filter(function(o){return o.g==='m'}).length,
+ inn=S.filter(function(o){return o.cc==='India'}).length,unk=S.filter(function(o){return o.cc==='Unknown'}).length,CC={};S.forEach(function(o){(CC[o.cc]=CC[o.cc]||[]).push(o.n)});
+ var nOut=n-inn-unk,nC=Object.keys(CC).filter(function(k){return k!=='Unknown'&&k!=='India'}).length;
+ $('herosub').textContent='Who is speaking, who is new, and where they are from.';
+ var mx=Math.max.apply(null,YRS.map(function(y){return ST.per[y].total}));
+ function gb(lab,a,b,c,ca,cb,cc2){var t=a+b+c;return '<div class="gr"><div>'+lab+'</div><div class="tr"><b style="width:'+pct(a,t)+'%;background:'+ca+'">'+pct(a,t)+'%</b><b style="width:'+pct(b,t)+'%;background:'+cb+'">'+(pct(b,t)>8?pct(b,t)+'%':'')+'</b><b style="width:'+pct(c,t)+'%;background:'+cc2+'"></b></div></div>'}
+ $('dash').innerHTML='<div class="kpis"><button class="kpi" data-kpi="all"><b>'+n+'</b><span>speakers</span></button><button class="kpi" data-kpi="nw"><b>'+F.length+'</b><span>first-time at BLF</span></button><button class="kpi" data-kpi="g"><b>'+pct(W,W+M)+'%</b><span>women, of '+(W+M)+' with a stated gender</span></button><button class="kpi" data-kpi="cc"><b>'+nOut+'</b><span>based outside India, '+nC+' countries</span></button></div>'+
+ '<div class="mini"><div class="panel" data-kpi="cc"><h5>Where they are from</h5>'+worldMap(CC)+'</div><div class="panel" data-kpi="yr"><h5>Speakers per year</h5><div class="vc">'+YRS.map(function(y){var p=ST.per[y],ht=p.total/mx*100,rt=p.returning/p.total*100;return '<div><div class="col" style="height:'+ht+'%"><b style="height:'+(100-rt)+'%;background:'+(y===2026?'var(--accent)':'var(--u)')+'"></b><b style="height:'+rt+'%;background:var(--fg)"></b></div><div class="y'+(y===2026?' now':'')+'">'+String(y).slice(2)+'</div></div>'}).join('')+'</div></div></div>'+
+ '<div class="hb"><div data-kpi="g" style="cursor:pointer">'+gb('Women · men',W,M,0,'var(--f)','var(--m)','var(--u)')+'</div><div data-kpi="nw" style="cursor:pointer">'+gb('New · returning',F.length,n-F.length,0,'var(--accent)','var(--fg)','var(--u)')+'</div></div>';
+ $('seg').innerHTML=SH.map(function(x){return '<button class="pill" data-shelf="'+x[0]+'" aria-pressed="'+(shelf===x[0])+'">'+x[1]+'</button>'}).join('');
+ var L=shelfList(shelf),body=$('dbody'),w=body.clientWidth,h=body.clientHeight,gap=10,target=Math.min(w>700?150:104,Math.max(48,h-62)),cols=Math.max(2,Math.floor((w+gap)/(target+gap))),iw=Math.min(160,(w-(cols-1)*gap)/cols),per=cols;
+ mkPager($('dpager'),'d',L.length,per,'');
+ var page=L.slice(pg.d*per,pg.d*per+per);
+ body.innerHTML='<div class="grid" style="grid-template-columns:repeat('+cols+',minmax(0,1fr))">'+page.map(function(o){var sub=shelf==='start'?(WHY[o.n]||''):shelf==='lang'?o.lg.join(' · '):shelf==='reg'?ed(o).length+' editions · '+o.role:o.role;return '<button class="card" data-open="'+S.indexOf(o)+'">'+pic(o,'')+'<div class="nm">'+esc(o.n)+'</div><div class="ln">'+esc(sub)+'</div></button>'}).join('')+'</div>'}
+$('dash').addEventListener('click',function(e){var k=e.target.closest('[data-kpi]'),c=e.target.closest('circle[data-cc]');if(c){reset();go({cc:c.dataset.cc});return}if(!k)return;var v=k.dataset.kpi;
+ if(v==='all'){reset();go({})}else if(v==='nw'){reset();go({nw:true})}else if(v==='g'){pg.y=1;setView('study')}else if(v==='cc'){pg.y=2;setView('study')}else{pg.y=4;setView('study')}});
+$('seg').addEventListener('click',function(e){var b=e.target.closest('[data-shelf]');if(b){shelf=b.dataset.shelf;pg.d=0;discover()}});
+$('dbody').addEventListener('click',function(e){var c=e.target.closest('[data-open]');if(c)openSheet(+c.dataset.open,c)});
+/* ranked */
+function rowH(){return window.innerWidth<520?54:60}
+function ranked(){var r=S.filter(function(o){return o.p}).sort(function(a,b){return a.r-b.r||(b.bk.length+ed(b).length)-(a.bk.length+ed(a).length)||a.n.localeCompare(b.n)}),rh=rowH(),body=$('hbody'),per=Math.max(1,Math.floor(body.clientHeight/rh));
+ mkPager($('hpager'),'h',r.length,per,'');var base=pg.h*per;
+ body.innerHTML='<div class="rows" style="--rh:'+rh+'px">'+r.slice(base,base+per).map(function(o,k){var i=S.indexOf(o);return '<div class="row"><div class="no">'+(base+k+1)+'</div><div data-open="'+i+'">'+pic(o,'th')+'</div><button class="mid" data-open="'+i+'"><span class="nm">'+esc(o.n)+'</span><span class="sl"><b>#'+o.r+' '+esc(o.t)+'</b> · '+(WHY[o.n]?esc(WHY[o.n]):esc(o.role))+'</span></button><button class="star" data-i="'+i+'" aria-pressed="'+(!!stars[o.n])+'" aria-label="Shortlist '+esc(o.n)+'">'+(stars[o.n]?'★':'☆')+'</button></div>'}).join('')+'</div>'}
+$('hbody').addEventListener('click',rowClick);
+function rowClick(e){var s=e.target.closest('.star');if(s){var o=S[+s.dataset.i];if(stars[o.n])delete stars[o.n];else stars[o.n]=1;save();renderView();return}var c=e.target.closest('[data-open]');if(c)openSheet(+c.dataset.open,c)}
+/* list */
+function match(o){
+ if(st.theme!=='All'&&o.t!==st.theme)return false;
+ if(st.cc!=='Any'&&o.cc!==st.cc)return false;if(st.city&&o.city!==st.city)return false;if(st.na&&!o.nonauth)return false;
+ if(st.picks&&!o.p)return false;if(st.nw&&!o.first)return false;if(st.ret&&o.first)return false;if(st.reg&&ed(o).length<3)return false;
+ if(st.books&&!o.bk.length)return false;if(st.g&&o.g!==st.g)return false;
+ if(st.lang==='*'&&!o.lg.length)return false;if(st.lang==='None'&&o.lg.length)return false;if(st.lang!=='Any'&&st.lang!=='*'&&st.lang!=='None'&&o.lg.indexOf(st.lang)<0)return false;
+ if(st.q){var h=(o.n+' '+(o.f||o.b)+' '+(o.l||'')+' '+o.role+' '+o.bk.map(function(b){return b.t}).join(' ')+' '+o.s.map(function(x){return x[1]}).join(' ')).toLowerCase();return st.q.toLowerCase().split(/\s+/).every(function(w){return h.indexOf(w)>-1})}
+ return true}
+function active(){var a=[];
+ if(st.theme!=='All')a.push(['theme',st.theme]);if(st.cc!=='Any')a.push(['cc',st.cc]);if(st.city)a.push(['city',st.city]);if(st.picks)a.push(['picks','Ranked picks']);if(st.nw)a.push(['nw','First-timers']);if(st.ret)a.push(['ret','Returning']);if(st.reg)a.push(['reg','3+ editions']);if(st.books)a.push(['books','Has books']);if(st.na)a.push(['na','Not authors']);
+ if(st.g)a.push(['g',st.g==='f'?'Women':'Men']);if(st.lang!=='Any')a.push(['lang',st.lang==='*'?'Any named language':st.lang==='None'?'Language not stated':st.lang]);return a}
+function drawer(){
+ var themes=[],seen={};S.forEach(function(o){if(!seen[o.t]){seen[o.t]=1;themes.push(o.t)}});
+ var lc={};S.forEach(function(o){o.lg.forEach(function(l){lc[l]=(lc[l]||0)+1})});var lk=Object.keys(lc).sort(function(a,b){return lc[b]-lc[a]||a.localeCompare(b)});
+ function ch(k,v,lab,on){return '<button class="pill" data-k="'+k+'" data-v="'+esc(v)+'" aria-pressed="'+on+'">'+esc(lab)+'</button>'}
+ $('drawer').innerHTML='<div class="pg"><h4>Show</h4><div class="chips">'+[['nw','First-timers'],['ret','Returning'],['reg','3+ editions'],['picks','Ranked picks'],['books','Has books'],['na','Not authors']].map(function(x){return ch('flag',x[0],x[1],!!st[x[0]])}).join('')+'</div></div>'+
+ '<div class="pg"><h4>Theme</h4><div class="chips">'+themes.map(function(t){return ch('theme',t,t,st.theme===t)}).join('')+'</div></div>'+
+ '<div class="pg"><h4>Gender (from bio pronouns)</h4><div class="chips">'+ch('g','f','Women',st.g==='f')+ch('g','m','Men',st.g==='m')+'</div></div>'+
+ '<div class="pg"><h4>Language</h4><select id="lang"><option value="Any">Any</option><option value="*"'+(st.lang==='*'?' selected':'')+'>Any named language</option>'+lk.map(function(l){return '<option'+(st.lang===l?' selected':'')+'>'+esc(l)+'</option>'}).join('')+'<option value="None"'+(st.lang==='None'?' selected':'')+'>Not stated</option></select> <select id="sort" aria-label="Sort">'+[['rank','Picks first'],['name','A to Z'],['visits','Most visits'],['new','First-timers first']].map(function(x){return '<option value="'+x[0]+'"'+(st.sort===x[0]?' selected':'')+'>'+x[1]+'</option>'}).join('')+'</select></div>'+
+ '<div class="sh-act"><button class="btn" id="ddone">Show results</button></div>'}
+function openDrawer(){drawer();$('veil').classList.add('open');$('drawer').classList.add('open')}
+function closeDrawer(){$('drawer').classList.remove('open');if(!$('sheet').classList.contains('open'))$('veil').classList.remove('open')}
+$('fbtn').onclick=openDrawer;
+$('drawer').addEventListener('click',function(e){if(e.target.id==='ddone'){closeDrawer();return}var b=e.target.closest('.pill');if(!b)return;var k=b.dataset.k,v=b.dataset.v;
+ if(k==='flag'){st[v]=!st[v];if(v==='nw'&&st.nw)st.ret=false;if(v==='ret'&&st.ret)st.nw=false}else if(k==='theme')st.theme=st.theme===v?'All':v;else if(k==='g')st.g=st.g===v?'':v;pg.s=0;drawer();render()});
+$('drawer').addEventListener('change',function(e){if(e.target.id==='lang')st.lang=e.target.value;if(e.target.id==='sort')st.sort=e.target.value;pg.s=0;render()});
+$('fchips').addEventListener('click',function(e){var b=e.target.closest('[data-r]');if(!b)return;if(b.dataset.r==='all')reset();else{var k=b.dataset.r;st[k]=(k==='theme')?'All':(k==='g'||k==='city')?'':(k==='lang'||k==='cc')?'Any':false}pg.s=0;render()});
+function render(){
+ var a=active();$('fcount').hidden=!a.length;$('fcount').textContent=a.length;
+ $('fchips').innerHTML=a.map(function(x){return '<button class="x" data-r="'+x[0]+'">'+esc(x[1])+' ×</button>'}).join('')+(a.length>1?'<button class="x" data-r="all" style="background:none;color:var(--muted)">Clear all</button>':'');
+ var r=S.filter(match);
+ r.sort(function(a,b){
+  if(st.sort==='name')return a.n.localeCompare(b.n);
+  if(st.sort==='visits')return ed(b).length-ed(a).length||b.y.length-a.y.length||a.n.localeCompare(b.n);
+  if(st.sort==='new')return b.first-a.first||a.n.localeCompare(b.n);
+  if(a.p&&b.p)return a.r-b.r||a.n.localeCompare(b.n);return (a.p?0:1)-(b.p?0:1)||a.n.localeCompare(b.n)});
+ $('count').textContent=r.length+' of '+S.length+' speakers';
+ var rh=rowH(),body=$('sbody'),per=Math.max(1,Math.floor(body.clientHeight/rh));mkPager($('spager'),'s',r.length,per,'');var base=pg.s*per;
+ body.innerHTML=r.length?'<div class="rows" style="--rh:'+rh+'px">'+r.slice(base,base+per).map(function(o){var i=S.indexOf(o);return '<div class="row nonum"><div data-open="'+i+'">'+pic(o,'th')+'</div><button class="mid" data-open="'+i+'"><span class="nm">'+esc(o.n)+'</span><span class="sl">'+esc(o.role)+' · '+esc(o.cc==='Unknown'?'country not stated':o.cc)+' · '+(o.first?'<b>First-time</b>':esc(hist(o)))+'</span></button><button class="star" data-i="'+i+'" aria-pressed="'+(!!stars[o.n])+'" aria-label="Shortlist '+esc(o.n)+'">'+(stars[o.n]?'★':'☆')+'</button></div>'}).join('')+'</div>':'<p class="empty">No speakers match these filters. Remove one above to see more.</p>'}
+$('q').addEventListener('input',function(e){st.q=e.target.value.trim();pg.s=0;render()});
+$('sbody').addEventListener('click',rowClick);
+/* sheet */
+function openSheet(i,from){curSheet=i;lastFocus=from;sTab='about';renderSheet();$('veil').classList.add('open');$('sheet').classList.add('open')}
+function renderSheet(){var o=S[curSheet],lat=o.l&&!/^not stated/i.test(o.l)?o.l:'',ys={};o.s.forEach(function(x){ys[x[0]]=1});var body='';
+ if(sTab==='about'){body='<p>'+esc(o.f||o.b)+'</p>'+(lat?'<p class="fa"><b>Latest</b> '+esc(lat)+'</p>':'')+(o.a&&o.a!=='Unknown'?'<p class="fa"><b>Age</b> '+esc(o.a)+(o.ag?' (estimated)':'')+'</p>':'')+(o.le?'<p class="fa"><b>Language</b> '+esc(o.le)+'</p>':'')+'<p class="fa"><b>Country</b> '+esc(o.cc)+' — '+esc(o.cb)+'</p>'}
+ else if(sTab==='books'){body='<div class="bl">'+o.bk.map(function(b){return '<div>'+tile(b)+'<br>'+esc(b.t.length>34?b.t.slice(0,32)+'…':b.t)+(b.b===2?'<br>(Open Library)':b.b===0?'<br>(not in bio)':'')+'</div>'}).join('')+'</div>'}
+ else{var ev=o.s.slice().sort(function(a,b){return a[0]-b[0]}).map(function(x){return '<li><b>'+x[0]+'</b>'+esc(x[1])+'</li>'}).concat(o.y.filter(function(y){return !ys[y]}).sort().map(function(y){return '<li><b>'+y+'</b>Listed as a speaker</li>'}));ev.sort(function(a,b){return a.slice(7,11)-b.slice(7,11)});ev.push('<li class="now"><b>2026</b>BLF, 11–13 Dec'+(lat?'. Latest: '+esc(lat):'')+'</li>');body=(o.first?'<p>No match in BLF archives from 2012 to 2025.</p>':'')+'<ol class="tlv">'+ev.join('')+'</ol>'}
+ var tabs=[['about',o.nonauth?'Who they are':'About']];if(o.bk.length)tabs.push(['books','Books ('+o.bk.length+')']);tabs.push(['hist','BLF history']);
+ $('sheet').innerHTML='<button class="close" id="sclose" aria-label="Close">×</button><div class="sh-top">'+pic(o,'')+'<div><h3>'+esc(o.n)+'</h3>'+tags(o)+tl(o)+'</div></div><div class="stabs">'+tabs.map(function(t){return '<button class="stab" data-st="'+t[0]+'" aria-selected="'+(sTab===t[0])+'">'+t[1]+'</button>'}).join('')+'</div><div class="sh-body">'+body+'</div><div class="sh-act"><button class="btn" id="sstar">'+(stars[o.n]?'★ In my shortlist':'☆ Add to shortlist')+'</button><a class="btn ghost" target="_blank" rel="noopener" href="https://bangaloreliteraturefestival.org/participant/'+esc(o.u)+'/">BLF page</a></div>';
+ $('sclose').onclick=closeSheet;$('sstar').onclick=function(){if(stars[o.n])delete stars[o.n];else stars[o.n]=1;save();renderSheet();renderView()}}
+$('sheet').addEventListener('click',function(e){var b=e.target.closest('[data-st]');if(b){sTab=b.dataset.st;renderSheet()}});
+function closeSheet(){$('sheet').classList.remove('open');if(!$('drawer').classList.contains('open'))$('veil').classList.remove('open');if(lastFocus&&lastFocus.focus)try{lastFocus.focus()}catch(e){}}
+$('veil').onclick=function(){closeSheet();closeDrawer()};
+/* study */
+function pct(a,b){return b?Math.round(a/b*100):0}
+var LAND={na:[[-168,66],[-156,71],[-125,70],[-95,70],[-82,68],[-62,58],[-56,50],[-66,44],[-76,35],[-81,30],[-80,25],[-90,29],[-97,26],[-105,22],[-97,16],[-88,15],[-83,9],[-80,8],[-86,12],[-92,15],[-105,20],[-112,28],[-118,32],[-124,40],[-124,48],[-135,58],[-150,60],[-165,60]],gl:[[-73,78],[-20,82],[-20,70],[-43,60],[-55,68]],sa:[[-78,8],[-70,12],[-60,10],[-50,0],[-35,-6],[-39,-15],[-48,-26],[-58,-38],[-68,-50],[-72,-54],[-75,-45],[-72,-30],[-70,-18],[-80,-5]],eu:[[-10,36],[-9,43],[-2,48],[-4,58],[5,62],[15,69],[30,70],[40,66],[40,55],[30,46],[28,41],[22,36],[12,38],[3,43],[-5,36]],af:[[-17,21],[-10,35],[10,37],[32,31],[37,22],[43,12],[51,12],[41,-2],[40,-15],[35,-25],[20,-35],[17,-30],[12,-17],[9,4],[-8,4],[-17,14]],as:[[28,41],[40,45],[50,40],[56,25],[60,23],[67,24],[73,20],[77,8],[80,13],[88,22],[92,21],[98,16],[100,3],[104,1],[109,12],[106,20],[122,30],[120,40],[128,38],[130,43],[140,50],[156,60],[170,66],[180,68],[140,72],[100,78],[70,73],[60,68],[50,60],[40,55]],ar:[[35,30],[43,13],[52,17],[58,22],[56,26],[48,29]],au:[[114,-22],[125,-14],[137,-12],[142,-11],[153,-26],[150,-38],[140,-38],[130,-32],[115,-34]],uk:[[-6,50],[2,52],[-2,58],[-6,56]],in:[[68,23],[71,28],[74,34],[78,35],[80,30],[88,27],[89,28],[92,28],[97,28],[95,26],[92,22],[88,22],[87,20],[85,19],[80,15],[80,10],[77,8],[74,13],[73,18],[70,21]]};
+var POS={'India':[79,22],'United Kingdom':[-2,54],'United States':[-98,39],'Mexico':[-102,23],'Norway':[9,62],'South Korea':[127.5,36.5],'France':[2,46.5],'Lithuania':[24,55.5],'South Africa':[25,-29],'Singapore':[103.8,1.3],'Chile':[-71,-33],'Croatia':[16,45],'United Arab Emirates':[54,24],'Germany':[10,51],'Bangladesh':[90,24],'Australia':[134,-25]};
+var CPOS={'Bengaluru':[77.6,12.97],'Delhi / NCR':[77.2,28.6],'Mumbai':[72.9,19.1],'Kolkata':[88.4,22.6],'Chennai':[80.3,13.1],'Kochi / Kerala':[76.3,9.9],'Pune':[73.9,18.5],'Guwahati / Assam':[91.7,26.1],'Mysuru':[76.6,12.3],'Madurai':[78.1,9.9]};
+function proj(o){var W=o.w,H=o.h;return {x:function(lo){return (lo-o.x0)/(o.x1-o.x0)*W},y:function(la){return (o.y1-la)/(o.y1-o.y0)*H}}}
+function poly(P,pr,keys){return keys.map(function(k){return '<polygon class="land" points="'+LAND[k].map(function(p){return pr.x(p[0]).toFixed(1)+','+pr.y(p[1]).toFixed(1)}).join(' ')+'"/>'}).join('')}
+function grat(pr,o,step){var h='';for(var lo=Math.ceil(o.x0/step)*step;lo<=o.x1;lo+=step)h+='<path class="grat" d="M'+pr.x(lo)+' 0V'+o.h+'"/>';for(var la=Math.ceil(o.y0/step)*step;la<=o.y1;la+=step)h+='<path class="grat" d="M0 '+pr.y(la)+'H'+o.w+'"/>';return h}
+function bub(pr,pos,cnt,attr,name,cls,r0,k,lab){var r=r0+Math.sqrt(cnt)*k;return '<circle class="b'+cls+'" '+attr+'="'+esc(name)+'" cx="'+pr.x(pos[0]).toFixed(1)+'" cy="'+pr.y(pos[1]).toFixed(1)+'" r="'+r.toFixed(1)+'"><title>'+esc(name)+': '+cnt+'</title></circle>'+(lab?'<text x="'+(pr.x(pos[0])+r+3).toFixed(1)+'" y="'+(pr.y(pos[1])+3).toFixed(1)+'">'+esc(name)+' '+cnt+'</text>':'')}
+function worldMap(CC){var o={w:720,h:330,x0:-180,x1:180,y0:-56,y1:80},pr=proj(o);var h='<svg class="map" viewBox="0 0 720 330" role="img" aria-label="Map of speaker countries">'+grat(pr,o,30)+poly(['na','gl','sa','eu','af','as','ar','au','uk'],pr,['na','gl','sa','eu','af','as','ar','au','uk']);
+ Object.keys(POS).filter(function(k){return CC[k]}).sort(function(a,b){return CC[b].length-CC[a].length}).forEach(function(k){h+=bub(pr,POS[k],CC[k].length,'data-cc',k,k==='India'?' o':'',4,k==='India'?1.6:3,CC[k].length>=2&&k!=='United Kingdom'&&k!=='France'&&k!=='Germany'&&k!=='Norway'&&k!=='Lithuania'&&k!=='Croatia')});return h+'</svg>'}
+function euMap(CC){var o={w:420,h:330,x0:-12,x1:30,y0:34,y1:68},pr=proj(o);var h='<svg class="map" viewBox="0 0 420 330" role="img" aria-label="Europe, speaker countries">'+grat(pr,o,10)+poly(0,pr,['eu','uk']);
+ ['United Kingdom','France','Germany','Norway','Lithuania','Croatia'].filter(function(k){return CC[k]}).forEach(function(k){h+=bub(pr,POS[k],CC[k].length,'data-cc',k,'',5,4,true)});return h+'</svg>'}
+function inMap(CITY){var o={w:420,h:410,x0:66,x1:98,y0:6,y1:37},pr=proj(o);var h='<svg class="map" viewBox="0 0 420 410" role="img" aria-label="India, cities named in bios">'+poly(0,pr,['in']);
+ Object.keys(CPOS).filter(function(k){return CITY[k]}).sort(function(a,b){return CITY[b]-CITY[a]}).forEach(function(k){h+=bub(pr,CPOS[k],CITY[k],'data-city',k,' o',4,2.6,k!=='Mysuru'&&k!=='Kochi / Kerala'&&k!=='Chennai')});return h+'</svg>'}
+
+function slides(){
+ var n=S.length,F=S.filter(function(o){return o.first}),R=S.filter(function(o){return !o.first}),W=S.filter(function(o){return o.g==='f'}).length,M=S.filter(function(o){return o.g==='m'}).length,out=[];
+ function hb(label,v,max,color,attr,key){return '<button class="hbar" '+(attr?attr+'="'+esc(key)+'"':'')+'><span>'+esc(label)+'</span><span class="tr"><b style="width:'+(max?v/max*100:0)+'%;background:'+color+'"></b></span><span>'+v+'</span></button>'}
+ function tiles(a){return '<div class="tiles">'+a.map(function(t){return '<div class="tile"><b>'+t[0]+'</b><span>'+t[1]+'</span></div>'}).join('')+'</div>'}
+ function head(big,color,h,t){return '<div class="hd"><p class="big" style="color:'+color+'">'+big+'</p><div><h2>'+h+'</h2><p class="t">'+t+'</p></div></div>'}
+ var TH={},TF={},TW={},TM={};S.forEach(function(o){TH[o.t]=(TH[o.t]||0)+1;if(o.first)TF[o.t]=(TF[o.t]||0)+1;if(o.g==='f')TW[o.t]=(TW[o.t]||0)+1;if(o.g==='m')TM[o.t]=(TM[o.t]||0)+1});
+ var thF=Object.keys(TF).sort(function(a,b){return TF[b]-TF[a]}).slice(0,5);
+ var thW=Object.keys(TH).filter(function(k){return (TW[k]||0)+(TM[k]||0)>=5}).sort(function(a,b){return (TW[b]||0)/((TW[b]||0)+(TM[b]||0))-(TW[a]||0)/((TW[a]||0)+(TM[a]||0))}).slice(0,5);
+ var Ff=F.filter(function(o){return o.g==='f'}).length,Fm=F.filter(function(o){return o.g==='m'}).length;
+ var dots=S.slice().sort(function(a,b){return a.first-b.first||a.n.localeCompare(b.n)}).map(function(o){return '<i class="'+(o.first?'n':'')+'" title="'+esc(o.n)+'"></i>'}).join('');
+ /* 1 new voices */
+ out.push('<div class="slide">'+head(F.length,'var(--accent)','speakers are new to BLF',pct(F.length,n)+'% of the '+n+' announced. One square per speaker.')+'<div class="two sec"><div><div class="waffle">'+dots+'</div><div class="legend"><button data-go="nw"><i style="background:var(--accent)"></i>First-time ('+F.length+')</button><button data-go="ret"><i style="background:var(--fg)"></i>Returning ('+R.length+')</button></div></div><div class="opt"><h5>Where the newcomers sit, by theme</h5>'+thF.map(function(k){return hb(k,TF[k],TF[thF[0]],'var(--accent)','','')}).join('')+'</div></div>'+tiles([[pct(Ff,Ff+Fm)+'%','of first-timers who are women'],[pct(Fm,Ff+Fm)+'%','are men'],[S.filter(function(o){return ed(o).length>=3}).length,'speakers back for the 3rd+ time'],[S.filter(function(o){return o.first&&o.p}).length,'ranked picks seen for the first time']])+'</div>');
+ /* 2 gender */
+ function gbar(lab,a){var f=a.filter(function(o){return o.g==='f'}).length,m=a.filter(function(o){return o.g==='m'}).length,u=a.length-f-m,t=a.length;return '<div class="gr"><div>'+lab+'</div><div class="tr" title="'+f+' women, '+m+' men, '+u+' not stated"><b style="width:'+pct(f,t)+'%;background:var(--f)">'+pct(f,t)+'%</b><b style="width:'+pct(m,t)+'%;background:var(--m)">'+pct(m,t)+'%</b><b style="width:'+pct(u,t)+'%;background:var(--u)"></b></div></div>'}
+ out.push('<div class="slide">'+head(pct(W,W+M)+'%','var(--f)','of speakers with a stated gender are women',W+' women, '+M+' men; '+(n-W-M)+' bios have no pronouns. Read from bio text, so an indicator not a census.')+'<div class="two sec"><div class="gb">'+gbar('Everyone',S)+gbar('First-time',F)+gbar('Returning',R)+gbar('Ranked picks',S.filter(function(o){return o.p}))+gbar('Authors',S.filter(function(o){return !o.nonauth}))+gbar('Not authors',S.filter(function(o){return o.nonauth}))+'<div class="legend"><button data-go="gf"><i style="background:var(--f)"></i>Women</button><button data-go="gm"><i style="background:var(--m)"></i>Men</button><span><i style="background:var(--u)"></i>Not stated</span></div></div><div class="opt"><h5>Highest share of women, by theme</h5>'+thW.map(function(k){return hb(k,pct(TW[k]||0,(TW[k]||0)+(TM[k]||0)),100,'var(--f)','','')}).join('')+'</div></div>'+tiles([[W,'women'],[M,'men'],[n-W-M,'not stated'],[pct(S.filter(function(o){return o.g==='f'&&o.first}).length,W)+'%','of the women are first-timers']])+'</div>');
+ /* 3 world */
+ var CC={},CITY={};S.forEach(function(o){(CC[o.cc]=CC[o.cc]||[]).push(o.n);if(o.city)CITY[o.city]=(CITY[o.city]||0)+1});
+ var nIn=(CC['India']||[]).length,nUn=(CC['Unknown']||[]).length,nOut=n-nIn-nUn,dia=S.filter(function(o){return o.dia}).length;
+ var keys=Object.keys(CC).filter(function(k){return k!=='Unknown'}).sort(function(a,b){return CC[b].length-CC[a].length||a.localeCompare(b)});
+ out.push('<div class="slide">'+head(nOut,'var(--accent)','speakers are based outside India',nIn+' in India ('+pct(nIn,n)+'%), '+nUn+' not placed from bios. Country is judged from each bio.')+'<div class="two sec"><div class="mapwrap">'+worldMap(CC)+'</div><div>'+keys.slice(0,7).map(function(k){return hb(k,CC[k].length,CC[keys[1]].length*3,k==='India'?'#0e7490':'var(--accent)','data-cc',k)}).join('')+'</div></div>'+tiles([[keys.length-1,'countries beyond India'],[dia,'born in India, living abroad'],[(CC['United Kingdom']||[]).length,'based in the UK'],[nUn,'not established']])+'</div>');
+ /* 4 India cities */
+ var ck=Object.keys(CITY).sort(function(a,b){return CITY[b]-CITY[a]}),cs=0;ck.forEach(function(k){cs+=CITY[k]});
+ out.push('<div class="slide">'+head(CITY['Bengaluru']||0,'#0e7490','India-based speakers name Bengaluru','Only '+cs+' of '+nIn+' India-based bios name a city, so these are floors. Tap a bar.')+'<div class="two sec"><div class="mapwrap opt" style="max-width:340px">'+inMap(CITY)+'</div><div>'+ck.map(function(k){return hb(k,CITY[k],CITY[ck[0]],'#0e7490','data-city',k)}).join('')+'</div></div>'+tiles([[ck.length,'cities named'],[pct(CITY['Bengaluru']||0,cs)+'%','of named cities is Bengaluru'],[(CITY['Delhi / NCR']||0)+(CITY['Mumbai']||0),'Delhi and Mumbai combined'],[nIn-cs,'India-based, city not stated']])+'</div>');
+ /* 5 years */
+ var mx=Math.max.apply(null,YRS.map(function(y){return ST.per[y].total})),peak=YRS.slice().sort(function(a,b){return ST.per[b].total-ST.per[a].total})[0];
+ out.push('<div class="slide">'+head(n,'var(--fg)','speakers in 2026, against '+ST.per[2025].total+' in 2025','Returning (dark) and new to the archive (grey; orange in 2026). Orange % below each year: share of that year\'s speakers back in 2026.')+'<div class="vc sec">'+YRS.map(function(y){var p=ST.per[y],ht=p.total/mx*100,rt=p.returning/p.total*100;return '<div><div class="v">'+p.total+'</div><div class="col" style="height:'+ht+'%"><b style="height:'+(100-rt)+'%;background:'+(y===2026?'var(--accent)':'var(--u)')+'"></b><b style="height:'+rt+'%;background:var(--fg)"></b></div><div class="y'+(y===2026?' now':'')+'">'+String(y).slice(2)+'</div><div class="y2">'+(y===2026?'':pct(p.in2026,p.total)+'%')+'</div></div>'}).join('')+'</div>'+tiles([[peak,'peak year, '+ST.per[peak].total+' speakers'],[pct(ST.per[2025].in2026,ST.per[2025].total)+'%','of 2025 speakers return in 2026'],[pct(ST.per[2025].returning,ST.per[2025].total)+'%','of 2025 had spoken before'],[pct(R.length,n)+'%','of 2026 has spoken before']])+'</div>');
+ /* 6 loyalty */
+ var hs=ST.hist,hm=Math.max.apply(null,Object.keys(hs).map(function(k){return hs[k]})),five=hs[5]+hs[6]+hs[7]+hs[8];
+ out.push('<div class="slide">'+head(hs[0],'var(--accent)','have no speaker-page listing from 2018 to 2025','Bars: editions attended out of 8 (2018 to 2025) by this year\'s speakers.')+'<div class="two sec"><div class="vc v6">'+Object.keys(hs).map(function(k){return '<div><div class="v">'+hs[k]+'</div><div class="col" style="height:'+(hs[k]/hm*100)+'%"><b style="height:100%;background:'+(k==='0'?'var(--accent)':'var(--fg)')+'"></b></div><div class="y">'+k+'</div></div>'}).join('')+'</div><div class="opt"><h5>Most frequent speakers, 2018 to 2025</h5>'+ST.lead.slice(0,6).map(function(x){return hb(x.n,x.y.length,8,x.in26?'var(--accent)':'var(--u)','','')}).join('')+'<div class="legend"><span><i style="background:var(--accent)"></i>speaking in 2026</span></div></div></div>'+tiles([[hs[1],'one edition'],[hs[2]+hs[3]+hs[4],'two to four'],[five,'five or more'],[hs[8],'all eight']])+'<div class="legend"><button data-go="reg">See the 3+ edition regulars →</button></div></div>');
+ /* 7 languages */
+ var lc={};S.forEach(function(o){o.lg.forEach(function(l){lc[l]=(lc[l]||0)+1})});var lk=Object.keys(lc).sort(function(a,b){return lc[b]-lc[a]||a.localeCompare(b)});var named=S.filter(function(o){return o.lg.length}).length;
+ out.push('<div class="slide">'+head(lk.length,'#0e7490','languages named in speaker bios','Only '+named+' of '+n+' bios name a language, so this undercounts. Tap a bubble or bar.')+'<div class="two sec"><div class="bubbles">'+lk.slice(0,12).map(function(l){var d=34+Math.sqrt(lc[l])*13;return '<button class="bub" style="width:'+d+'px;height:'+d+'px;font-size:'+(d>60?12:10)+'px" data-lang="'+esc(l)+'">'+esc(l)+'<small>'+lc[l]+'</small></button>'}).join('')+'</div><div class="opt">'+lk.slice(0,8).map(function(l){return hb(l,lc[l],lc[lk[0]],'#0e7490','data-lang',l)}).join('')+'</div></div>'+tiles([[named,'speakers with a named language'],[pct(named,n)+'%','of all speakers'],[S.filter(function(o){return o.lg.length>1}).length,'work across 2+ languages'],[lk[0]+' '+lc[lk[0]],'most common']])+'<p class="note"><b>Method:</b> BLF 2026 speakers page and bios, archive speaker pages (2018 to 2025) and schedules (2012 to 2025), matched by name. Gender from bio pronouns; language and country only where a bio states them. No gender history by year yet.</p></div>');
+ return out}
+function story(){if(!ST||!S.length)return;var sl=slides();if(pg.y>=sl.length)pg.y=sl.length-1;$('ybody').innerHTML=sl[pg.y];
+ $('ypager').innerHTML='<button class="pbtn" data-step="-1"'+(pg.y<=0?' disabled':'')+'>‹ Prev</button><span class="dots">'+sl.map(function(_,k){return '<i class="'+(k===pg.y?'on':'')+'"></i>'}).join('')+'</span><button class="pbtn" data-step="1"'+(pg.y>=sl.length-1?' disabled':'')+'>Next ›</button>'}
+$('ybody').addEventListener('click',function(e){var cc=e.target.closest('[data-cc]'),ct=e.target.closest('[data-city]'),g=e.target.closest('[data-go]'),b=e.target.closest('[data-lang]');
+ if(cc){reset();go({cc:cc.dataset.cc});return}if(ct){reset();go({city:ct.dataset.city,cc:'India'});return}if(b){reset();go({lang:b.dataset.lang});return}if(!g)return;reset();var k=g.dataset.go;
+ if(k==='nw')go({nw:true});else if(k==='ret')go({ret:true});else if(k==='reg')go({reg:true,sort:'visits'});else if(k==='gf')go({g:'f'});else go({g:'m'})});
+/* tracker */
+function status(o){var e=ed(o);if(o.first)return 'First-time';var set={};e.forEach(function(y){set[y]=1});var sk=0;for(var y=2025;y>=2018&&set[y];y--)sk++;
+ if(e.length>=4)return 'Regular'+(sk>=2?' · '+sk+'-edition streak':'');if(sk>=2)return 'Streak · '+sk+' editions';
+ if(e.length&&!set[2025]&&!set[2024])return 'Comeback (last seen '+Math.max.apply(null,e)+')';if(!e.length)return 'Returning (earlier schedules only)';return 'Returning'}
+var presets=[['First-timers',function(o){return o.first}],['Regulars',function(o){return ed(o).length>=4}],['Picks',function(o){return o.p}]];
+function tracker(){var names=S.filter(function(o){return stars[o.n]});
+ $('tpresets').innerHTML=presets.map(function(p,i){return '<button class="pill" data-p="'+i+'">Add all: '+p[0]+'</button>'}).join('');
+ var rh=rowH(),body=$('tbody'),per=Math.max(1,Math.floor(body.clientHeight/rh));mkPager($('tpager'),'t',names.length,per,'');var base=pg.t*per;
+ body.innerHTML=names.length?'<div class="rows" style="--rh:'+rh+'px">'+names.slice(base,base+per).map(function(o){var g='<div class="grid9">'+YRS.map(function(y){return '<i class="'+(y===2026?'now':(o.y.indexOf(y)>-1?'on':''))+'" title="'+y+'"></i>'}).join('')+'</div>';return '<div class="row nonum" style="grid-template-columns:1fr auto auto"><button class="mid" data-open="'+S.indexOf(o)+'"><span class="nm">'+esc(o.n)+'</span><span class="sl status">'+esc(status(o))+'</span></button>'+g+'<button class="star" data-rm="'+S.indexOf(o)+'" aria-label="Remove '+esc(o.n)+'">×</button></div>'}).join('')+'</div>':'<p class="empty">Nobody tracked yet. Add a name above, use a preset, or star speakers anywhere.</p>'}
+$('tpresets').addEventListener('click',function(e){var b=e.target.closest('[data-p]');if(!b)return;S.filter(presets[+b.dataset.p][1]).forEach(function(o){stars[o.n]=1});save();tracker()});
+$('tadd').onclick=function(){var q=$('tq').value.trim().toLowerCase();if(!q)return;var m=S.filter(function(o){return o.n.toLowerCase().indexOf(q)>-1})[0];if(m){stars[m.n]=1;save();$('tq').value='';tracker()}};
+$('tq').addEventListener('keydown',function(e){if(e.key==='Enter')$('tadd').click()});
+$('tbody').addEventListener('click',function(e){var b=e.target.closest('[data-rm]');if(b){delete stars[S[+b.dataset.rm].n];save();tracker();return}var c=e.target.closest('[data-open]');if(c)openSheet(+c.dataset.open,c)});
+/* boot */
+Promise.all([fetch('data.json').then(function(r){return r.json()}),fetch('stats.json').then(function(r){return r.json()})]).then(function(a){S=a[0];ST=a[1];var h=(location.hash||'').slice(1);setView(VIEWS.indexOf(h)>-1?h:'discover',true)}).catch(function(){$('dbody').innerHTML='<p class="empty">Could not load the speaker data.</p>'});
+window.addEventListener('hashchange',function(){var h=(location.hash||'').slice(1);if(VIEWS.indexOf(h)>-1&&h!==st.view)setView(h,true)});
+})();
+</script>
+
+
+</html>
